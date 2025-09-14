@@ -1,0 +1,85 @@
+name: Auto Create Tag from Package Version
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'personal-website-ui/package.json'
+
+jobs:
+  auto-tag:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Get current version
+        id: version
+        run: |
+          VERSION_TO_TAG=$(node -p "require('./personal-website-ui/package.json').version")
+          echo "version_to_tag=$VERSION_TO_TAG" >> $GITHUB_OUTPUT
+          echo "Using personal-website-ui/package.json version: $VERSION_TO_TAG"
+
+      - name: Check if version was updated
+        id: version-check
+        run: |
+          # Get the previous version from git history
+          PREVIOUS_VERSION=$(git show HEAD~1:personal-website-ui/package.json 2>/dev/null | grep '"version"' | sed 's/.*"version": "\([^"]*\)".*/\1/' || echo "0.0.0")
+          
+          # Get current version
+          CURRENT_VERSION=$(node -p "require('./personal-website-ui/package.json').version")
+          
+          echo "Previous version: $PREVIOUS_VERSION"
+          echo "Current version: $CURRENT_VERSION"
+          
+          # Check if version changed
+          if [ "$PREVIOUS_VERSION" != "$CURRENT_VERSION" ]; then
+            echo "✅ Version updated from $PREVIOUS_VERSION to $CURRENT_VERSION"
+            echo "should_tag=true" >> $GITHUB_OUTPUT
+          else
+            echo "❌ No version change detected"
+            echo "should_tag=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create and push tag
+        if: steps.version-check.outputs.should_tag == 'true'
+        run: |
+          VERSION="${{ steps.version.outputs.version_to_tag }}"
+          TAG_NAME="ui-v$VERSION"
+          
+          echo "Creating tag: $TAG_NAME"
+          
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          # Check if tag already exists
+          if git tag -l | grep -q "^$TAG_NAME$"; then
+            echo "⚠️ Tag $TAG_NAME already exists - skipping"
+            exit 0
+          fi
+          
+          # Create tag
+          git tag -a "$TAG_NAME" -m "Release $VERSION"
+          
+          # Push tag
+          git push origin "$TAG_NAME"
+          
+          echo "✅ Tag $TAG_NAME created and pushed successfully"
+
+      - name: Show summary
+        run: |
+          echo "=== Workflow Summary ==="
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Version: ${{ steps.version.outputs.version_to_tag }}"
+          echo "Tag created: ${{ steps.version-check.outputs.should_tag }}"
