@@ -1,0 +1,60 @@
+[data-color-scheme="dark"] {
+  // RGB Values for Opacity Control
+  --color-gray-400-rgb: 119, 124, 124;
+  --color-teal-300-rgb: 50, 184, 198;
+  --color-gray-300-rgb: 167, 169, 169;
+  --color-gray-200-rgb: 245, 245, 245;
+
+  // Semantic Colors
+  --color-background: var(--color-charcoal-700);
+  --color-surface: var(--color-charcoal-800);
+  --color-text: var(--color-gray-200);
+  --color-text-secondary: rgba(var(--color-gray-300-rgb), 0.7);
+  --color-primary: var(--color-teal-300);
+  --color-primary-hover: var(--color-teal-400);
+  --color-primary-active: var(--color-teal-800);
+  --color-secondary: rgba(var(--color-gray-400-rgb), 0.15);
+  --color-secondary-hover: rgba(var(--color-gray-400-rgb), 0.25);
+  --color-secondary-active: rgba(var(--color-gray-400-rgb), 0.3);
+  --color-border: rgba(var(--color-gray-400-rgb), 0.3);
+  --color-focus-ring: rgba(var(--color-teal-300-rgb), 0.4);
+
+  // Component Variables
+  --navbar-bg: var(--color-surface);
+  --border-color: var(--color-border);
+  --portfolio-primary: var(--color-primary);
+  --text-secondary: var(--color-text-secondary);
+}
+
+// Theme Toggle Styles
+[data-color-scheme="light"] .theme-toggle-track {
+  background: #a8d5a8 !important;
+}
+
+[data-color-scheme="dark"] .theme-toggle-track {
+  background: #3b4043 !important;
+}
+
+[data-color-scheme="light"] .theme-toggle-thumb {
+  transform: translateX(30px) !important;
+}
+
+[data-color-scheme="dark"] .theme-toggle-thumb {
+  transform: translateX(0) !important;
+}
+
+[data-color-scheme="light"] .sun-icon {
+  opacity: 1 !important;
+}
+
+[data-color-scheme="light"] .moon-icon {
+  opacity: 0 !important;
+}
+
+[data-color-scheme="dark"] .sun-icon {
+  opacity: 0 !important;
+}
+
+[data-color-scheme="dark"] .moon-icon {
+  opacity: 1 !important;
+}

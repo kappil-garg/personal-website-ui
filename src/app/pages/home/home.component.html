@@ -1,0 +1,20 @@
+<section class="section container page-content">
+  @if (personalInfo()) {
+    <div class="hero-section">
+      <div class="hero-image">
+        <img
+          [src]="personalInfo()!.profileImage"
+          [alt]="personalInfo()!.name"
+          class="profile-pic"
+        />
+      </div>
+      <h1 class="hero-title">Hi, I'm {{ personalInfo()!.name }}</h1>
+      <p class="hero-subtitle">{{ personalInfo()!.title }}</p>
+      <div class="hero-description">
+        @for (paragraph of personalInfo()!.description; track $index) {
+          <p>{{ paragraph }}</p>
+        }
+      </div>
+    </div>
+  }
+</section>

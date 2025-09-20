@@ -1,38 +1,16 @@
-.app-container {
-  min-height: 100vh;
+:host {
   display: flex;
   flex-direction: column;
+  width: 100%;
+  min-height: 100vh;
 }
 
-.app-header {
-  background: var(--color-surface);
-  padding: var(--space-32) 0;
-  text-align: center;
-  border-bottom: 1px solid var(--color-border);
+router-outlet {
+  display: block;
+  width: 100%;
 }
 
-.app-header h1 {
-  color: var(--color-primary);
-  margin-bottom: var(--space-8);
-}
-
-.app-header p {
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-lg);
-}
-
-.development-status {
-  color: var(--color-warning) !important;
-  font-weight: var(--font-weight-medium);
-  font-size: var(--font-size-base);
-  margin-top: var(--space-16);
-  padding: var(--space-8) var(--space-16);
-  background: rgba(var(--color-orange-500-rgb), 0.1);
-  border-radius: var(--radius-base);
-  display: inline-block;
-}
-
-.app-main {
+/* Prevent layout shift during route transitions */
+.main-content {
   flex: 1;
-  padding: var(--space-32) 0;
 }

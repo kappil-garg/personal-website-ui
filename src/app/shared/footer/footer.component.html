@@ -1,0 +1,19 @@
+<footer class="footer">
+  <div class="footer-container">
+    <div class="footer-content">
+      <div class="footer-links">
+        @for (link of footerLinks(); track link.id) {
+          <a
+            [routerLink]="link.route"
+            class="footer-link"
+          >
+            {{ link.label }}
+          </a>
+        }
+      </div>
+      <div class="footer-copyright">
+        <p>&copy; {{ currentYear }} Kapil Garg. All rights reserved.</p>
+      </div>
+    </div>
+  </div>
+</footer>

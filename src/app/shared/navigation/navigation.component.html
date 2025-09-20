@@ -1,0 +1,59 @@
+<nav class="navbar">
+  <div class="nav-container">
+    <div class="nav-logo">
+      <a routerLink="/home" class="logo-link">
+        <img
+          src="assets/images/personal-icon.png"
+          alt="KG"
+          class="logo-image"
+        />
+      </a>
+    </div>
+
+    <div class="nav-center">
+      <ul class="nav-menu" [class.active]="isMobileMenuOpen()">
+        @for (item of navigationItems(); track item.id) {
+          <li class="nav-item">
+            <a
+              [routerLink]="item.route"
+              class="nav-link"
+              routerLinkActive="active"
+              (click)="closeMobileMenu()"
+              >{{ item.label }}</a
+            >
+          </li>
+        }
+      </ul>
+    </div>
+
+    <div class="theme-toggle-container">
+      <button
+        class="theme-toggle"
+        (click)="toggleTheme()"
+        [attr.aria-label]="
+          'Switch to ' +
+          (currentTheme() === 'light' ? 'dark' : 'light') +
+          ' theme'
+        "
+      >
+        <div class="theme-toggle-track">
+          <div class="theme-toggle-thumb"></div>
+          <div class="theme-toggle-icons">
+            <span class="theme-icon sun-icon">☀️</span>
+            <span class="theme-icon moon-icon">🌙</span>
+          </div>
+        </div>
+      </button>
+    </div>
+
+    <div
+      class="hamburger"
+      [class.active]="isMobileMenuOpen()"
+      (click)="toggleMobileMenu()"
+    >
+      <span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+    </div>
+  </div>
+</nav>
