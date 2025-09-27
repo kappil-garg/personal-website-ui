@@ -4,17 +4,15 @@ import { isPlatformBrowser } from '@angular/common';
 export type ThemeMode = 'light' | 'dark';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ThemeService {
 
-  private readonly storageKey = 'portfolio-theme';
   private readonly isBrowser: boolean;
-
-  // Signal to track current theme
-  currentTheme = signal<ThemeMode>('light');
+  private readonly storageKey = 'portfolio-theme';
 
   isInitializing = signal(true);
+  currentTheme = signal<ThemeMode>('light');
 
   constructor(@Inject(PLATFORM_ID) private platformId: object) {
     this.isBrowser = isPlatformBrowser(this.platformId);
@@ -35,7 +33,9 @@ export class ThemeService {
       if (stored === 'light' || stored === 'dark') {
         this.currentTheme.set(stored);
       } else {
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const prefersDark = window.matchMedia(
+          '(prefers-color-scheme: dark)',
+        ).matches;
         this.currentTheme.set(prefersDark ? 'dark' : 'light');
       }
     } catch (error) {
@@ -101,7 +101,6 @@ export class ThemeService {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     mediaQuery.addEventListener('change', (e) => {
       const stored = localStorage.getItem(this.storageKey);
-      // Only auto-switch if user hasn't manually set a preference
       if (!stored) {
         this.currentTheme.set(e.matches ? 'dark' : 'light');
       }

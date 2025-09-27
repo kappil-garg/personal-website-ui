@@ -10,7 +10,6 @@ router-outlet {
   width: 100%;
 }
 
-/* Prevent layout shift during route transitions */
 .main-content {
   flex: 1;
 }

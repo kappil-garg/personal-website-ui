@@ -11,49 +11,98 @@
     </div>
 
     <div class="nav-center">
-      <ul class="nav-menu" [class.active]="isMobileMenuOpen()">
-        @for (item of navigationItems(); track item.id) {
-          <li class="nav-item">
-            <a
-              [routerLink]="item.route"
-              class="nav-link"
-              routerLinkActive="active"
-              (click)="closeMobileMenu()"
-              >{{ item.label }}</a
-            >
-          </li>
-        }
-      </ul>
+      <div class="nav-tabs-container">
+        <div class="nav-tabs">
+          @for (item of navigationItems(); track item.id) {
+            <div class="nav-tab" [class.active]="isCurrentRoute(item.route)">
+              <a
+                [routerLink]="item.route"
+                class="nav-tab-link"
+                routerLinkActive="active"
+              >
+                <div class="nav-tab-icon">
+                  <i [class]="getIconClass(item.id)" class="tab-icon"></i>
+                </div>
+                <span class="nav-tab-label">{{ item.label }}</span>
+              </a>
+            </div>
+          }
+        </div>
+      </div>
     </div>
 
-    <div class="theme-toggle-container">
+    <div class="nav-actions">
       <button
         class="theme-toggle"
         (click)="toggleTheme()"
         [attr.aria-label]="
           'Switch to ' +
-          (currentTheme() === 'light' ? 'dark' : 'light') +
+          (themeService.currentTheme() === 'light' ? 'dark' : 'light') +
           ' theme'
         "
+        title="Toggle theme"
       >
-        <div class="theme-toggle-track">
-          <div class="theme-toggle-thumb"></div>
-          <div class="theme-toggle-icons">
-            <span class="theme-icon sun-icon">☀️</span>
-            <span class="theme-icon moon-icon">🌙</span>
-          </div>
-        </div>
+        <i
+          class="fas"
+          [class.fa-sun]="themeService.currentTheme() === 'light'"
+          [class.fa-moon]="themeService.currentTheme() === 'dark'"
+          [class.sun-icon]="themeService.currentTheme() === 'light'"
+          [class.moon-icon]="themeService.currentTheme() === 'dark'"
+        ></i>
       </button>
-    </div>
 
-    <div
-      class="hamburger"
-      [class.active]="isMobileMenuOpen()"
-      (click)="toggleMobileMenu()"
-    >
-      <span class="bar"></span>
-      <span class="bar"></span>
-      <span class="bar"></span>
+      <div
+        class="hamburger"
+        [class.active]="isMobileMenuOpen()"
+        (click)="toggleMobileMenu()"
+      >
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </div>
     </div>
   </div>
 </nav>
+
+<!-- Mobile Navigation Menu -->
+<div class="mobile-nav-menu" [class.active]="isMobileMenuOpen()">
+  <div class="nav-tabs">
+    @for (item of navigationItems(); track item.id) {
+      <div class="nav-tab" [class.active]="isCurrentRoute(item.route)">
+        <a
+          [routerLink]="item.route"
+          class="nav-tab-link"
+          routerLinkActive="active"
+          (click)="closeMobileMenu()"
+        >
+          <div class="nav-tab-icon">
+            <i [class]="getIconClass(item.id)" class="tab-icon"></i>
+          </div>
+          <span class="nav-tab-label">{{ item.label }}</span>
+        </a>
+      </div>
+    }
+  </div>
+
+  <!-- Theme Toggle in Sidebar -->
+  <div class="mobile-theme-toggle">
+    <button
+      class="theme-toggle"
+      (click)="toggleTheme()"
+      [attr.aria-label]="
+        'Switch to ' +
+        (themeService.currentTheme() === 'light' ? 'dark' : 'light') +
+        ' theme'
+      "
+      title="Toggle theme"
+    >
+      <i
+        class="fas"
+        [class.fa-sun]="themeService.currentTheme() === 'light'"
+        [class.fa-moon]="themeService.currentTheme() === 'dark'"
+        [class.sun-icon]="themeService.currentTheme() === 'light'"
+        [class.moon-icon]="themeService.currentTheme() === 'dark'"
+      ></i>
+    </button>
+  </div>
+</div>

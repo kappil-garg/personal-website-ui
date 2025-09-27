@@ -1,19 +1,39 @@
-<section class="section container page-content">
+<section class="section container hero-container">
   @if (personalInfo()) {
     <div class="hero-section">
       <div class="hero-image">
-        <img
-          [src]="personalInfo()!.profileImage"
-          [alt]="personalInfo()!.name"
-          class="profile-pic"
-        />
+        <div class="image-container">
+          <img
+            [src]="personalInfo()!.profileImage"
+            [alt]="personalInfo()!.name + ' - Java Full-Stack Developer'"
+            class="profile-pic"
+          />
+          <div class="image-decoration"></div>
+        </div>
       </div>
-      <h1 class="hero-title">Hi, I'm {{ personalInfo()!.name }}</h1>
-      <p class="hero-subtitle">{{ personalInfo()!.title }}</p>
-      <div class="hero-description">
-        @for (paragraph of personalInfo()!.description; track $index) {
-          <p>{{ paragraph }}</p>
-        }
+      <div class="hero-content">
+        <div class="content-wrapper">
+          <p class="hero-greeting">Hello, I'm</p>
+          <h1 class="hero-title">
+            <span class="gradient-name">{{ personalInfo()!.name }}</span>
+          </h1>
+          <p class="hero-tagline">{{ personalInfo()!.tagline }}</p>
+          <div class="hero-description">
+            @for (paragraph of personalInfo()!.description; track $index) {
+              <p>{{ paragraph }}</p>
+            }
+          </div>
+          <div class="hero-actions">
+            <button class="btn btn-primary" (click)="navigateToProjects()">
+              <span>View My Work</span>
+              <i class="fas fa-arrow-right"></i>
+            </button>
+            <button class="btn btn-secondary" (click)="navigateToContact()">
+              <i class="fas fa-envelope"></i>
+              <span>Get in Touch</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   }

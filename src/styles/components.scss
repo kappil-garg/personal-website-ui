@@ -1,3 +1,17 @@
+@use "./breakpoints.scss" as *;
+
+@layer components;
+
+.hero-container {
+  margin-top: var(--hero-top-spacing-mobile);
+  min-height: calc(
+    100vh - var(--navbar-height) - var(--hero-top-spacing-mobile)
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .coming-soon-container {
   display: flex;
   flex-direction: column;
@@ -6,14 +20,14 @@
   text-align: center;
   min-height: 60vh;
   max-height: 80vh;
-  padding: var(--space-48) var(--space-24);
+  padding: var(--space-12) var(--space-6);
   transform: translateZ(0);
   will-change: auto;
 }
 
 .coming-soon-icon {
   font-size: 4rem;
-  margin-bottom: var(--space-24);
+  margin-bottom: var(--space-6);
   opacity: 0.8;
 }
 
@@ -21,14 +35,14 @@
   font-size: var(--font-size-4xl);
   font-weight: var(--font-weight-bold);
   color: var(--color-text);
-  margin-bottom: var(--space-16);
+  margin-bottom: var(--space-4);
   line-height: 1.2;
 }
 
 .coming-soon-text {
   font-size: var(--font-size-xl);
   color: var(--color-text-secondary);
-  margin-bottom: var(--space-16);
+  margin-bottom: var(--space-4);
   font-weight: var(--font-weight-medium);
 }
 
@@ -41,32 +55,10 @@
   opacity: 0.8;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeInStable {
-  from {
-    opacity: 0;
-    transform: translateY(5px) translateZ(0);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) translateZ(0);
-  }
-}
-
-@media (max-width: 768px) {
+@include mobile-only {
   .coming-soon-container {
     min-height: 50vh;
-    padding: var(--space-32) var(--space-16);
+    padding: var(--space-8) var(--space-4);
   }
 
   .coming-soon-icon {
@@ -83,5 +75,11 @@
 
   .coming-soon-description {
     font-size: var(--font-size-sm);
+  }
+}
+
+@include tablet-up {
+  .hero-container {
+    margin-top: var(--hero-top-spacing);
   }
 }

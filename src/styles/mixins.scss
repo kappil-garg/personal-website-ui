@@ -1,0 +1,82 @@
+// Typography mixins for consistent text styles
+@mixin heading-base {
+  font-family: var(--font-family-heading);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+@mixin text-base {
+  font-family: var(--font-family-base);
+  line-height: var(--line-height-normal);
+}
+
+// Button mixins for consistent styling
+@mixin button-base {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-8);
+  border-radius: 50px;
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  text-decoration: none;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-standard);
+  position: relative;
+  overflow: hidden;
+  min-width: 160px;
+  justify-content: center;
+  letter-spacing: 0.02em;
+}
+
+@mixin button-primary {
+  @include button-base;
+  background: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    var(--color-primary-hover) 100%
+  );
+  color: white;
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 15px rgba(var(--color-primary-rgb), 0.3);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(var(--color-primary-rgb), 0.4);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+@mixin button-secondary {
+  @include button-base;
+  background: transparent;
+  color: var(--color-text);
+  border-color: var(--color-text-secondary);
+  backdrop-filter: blur(10px);
+
+  &:hover {
+    background: var(--color-text);
+    color: var(--color-background);
+    border-color: var(--color-text);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(var(--color-black-rgb), 0.15);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// Focus states for accessibility
+@mixin focus-visible {
+  &:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+}

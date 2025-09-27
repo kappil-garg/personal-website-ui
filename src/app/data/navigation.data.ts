@@ -3,6 +3,7 @@ export interface NavigationItem {
   label: string;
   route: string;
   order: number;
+  icon: string;
 }
 
 export const NAVIGATION_ITEMS: NavigationItem[] = [
@@ -11,50 +12,37 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
     label: 'Experience',
     route: '/experience',
     order: 1,
-  },
-  {
-    id: 'projects',
-    label: 'Projects',
-    route: '/projects',
-    order: 2,
-  },
-  {
-    id: 'skills',
-    label: 'Skills',
-    route: '/skills',
-    order: 3,
-  },
-  {
-    id: 'education',
-    label: 'Education',
-    route: '/education',
-    order: 4,
-  },
-  {
-    id: 'certifications',
-    label: 'Certifications',
-    route: '/certifications',
-    order: 5,
+    icon: 'fas fa-briefcase',
   },
   {
     id: 'blogs',
     label: 'Blogs',
     route: '/blogs',
-    order: 6,
+    order: 2,
+    icon: 'fas fa-blog',
+  },
+  {
+    id: 'projects',
+    label: 'Projects',
+    route: '/projects',
+    order: 3,
+    icon: 'fas fa-project-diagram',
+  },
+  {
+    id: 'contact',
+    label: 'Contact',
+    route: '/contact',
+    order: 4,
+    icon: 'fas fa-envelope',
   },
 ];
 
 export const FOOTER_LINKS: NavigationItem[] = [
   {
     id: 'about-me',
-    label: 'About Me',
+    label: 'Know More About Me',
     route: '/about-me',
     order: 1,
-  },
-  {
-    id: 'contact',
-    label: 'Contact',
-    route: '/contact',
-    order: 2,
+    icon: 'fas fa-heart',
   },
 ];

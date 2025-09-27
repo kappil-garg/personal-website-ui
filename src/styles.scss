@@ -1,5 +1,17 @@
 @use "./styles/variables.scss";
+@use "./styles/mixins.scss";
 @use "./styles/themes.scss";
 @use "./styles/base.scss";
 @use "./styles/layout.scss";
 @use "./styles/components.scss";
+@use "./styles/utilities.scss";
+@use "./styles/breakpoints.scss";
+@use "./styles/animations.scss";
+@use "./styles/background.scss";
+
+@layer reset, base, layout, components, utilities, themes;
+
+.main-content {
+  position: relative;
+  z-index: 1;
+}

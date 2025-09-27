@@ -1,53 +1,53 @@
+@use "./breakpoints.scss" as *;
+
+@layer layout;
+
 .container {
   width: 100%;
   max-width: var(--container-lg);
   margin: 0 auto;
-  padding: 0 var(--space-16);
-
-  @media (min-width: 768px) {
-    padding: 0 var(--space-24);
-  }
-
-  @media (min-width: 1024px) {
-    padding: 0 var(--space-32);
-  }
+  padding: 0 var(--space-3);
+  container-type: inline-size;
 }
 
 .section {
-  padding: var(--space-32) 0;
-
-  @media (min-width: 768px) {
-    padding: 4rem 0;
-  }
-
-  @media (min-width: 1024px) {
-    padding: 5rem 0;
-  }
+  padding: var(--space-8) 0;
+  content-visibility: auto;
+  contain-intrinsic-size: 0 500px;
 }
 
 .main-content {
-  min-height: calc(100vh - 70px);
-  padding-top: 70px;
+  min-height: calc(100vh - var(--navbar-height));
   position: relative;
   width: 100%;
   display: flex;
   flex-direction: column;
 }
 
-.page-content {
-  min-height: calc(100vh - 70px);
-  width: 100%;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  transform: translateZ(0);
-  will-change: auto;
-  animation: fadeInStable var(--duration-normal) var(--ease-standard);
+.hero-container {
+  margin-top: var(--hero-top-spacing-mobile);
 }
 
-@media (max-width: 768px) {
+@include tablet-up {
   .container {
-    padding: 0 var(--space-12);
+    padding: 0 var(--space-6);
+  }
+
+  .section {
+    padding: var(--space-12) 0;
+  }
+
+  .hero-container {
+    margin-top: var(--hero-top-spacing);
+  }
+}
+
+@include desktop-up {
+  .container {
+    padding: 0 var(--space-8);
+  }
+
+  .section {
+    padding: var(--space-16) 0;
   }
 }

@@ -1,18 +1,31 @@
 <footer class="footer">
   <div class="footer-container">
     <div class="footer-content">
-      <div class="footer-links">
-        @for (link of footerLinks(); track link.id) {
-          <a
-            [routerLink]="link.route"
-            class="footer-link"
-          >
-            {{ link.label }}
-          </a>
-        }
+      <div class="footer-left">
+        <p class="footer-copyright">
+          &copy; {{ currentYear }} Kapil Garg. All rights reserved.
+        </p>
       </div>
-      <div class="footer-copyright">
-        <p>&copy; {{ currentYear }} Kapil Garg. All rights reserved.</p>
+      <div class="footer-center">
+        <a
+          href="https://github.com/kappil-garg"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="footer-built-by"
+        >
+          <span class="built-by-text">Built by</span>
+          <span class="built-by-name">Kapil Garg</span>
+          <i class="fab fa-github built-by-icon"></i>
+        </a>
+      </div>
+      <div class="footer-right">
+        <a [routerLink]="footerLinks()[0].route" class="footer-link">
+          <span class="footer-link-text">{{ footerLinks()[0].label }}</span>
+          <i
+            [class]="getIconClass(footerLinks()[0].id)"
+            class="footer-link-icon"
+          ></i>
+        </a>
       </div>
     </div>
   </div>

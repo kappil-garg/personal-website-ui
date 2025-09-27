@@ -1,0 +1,131 @@
+@use "./animations.scss" as *;
+
+.animated-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.floating-shapes {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.shape {
+  position: absolute;
+  border-radius: 50%;
+  background: linear-gradient(
+    135deg,
+    rgba(var(--color-primary-rgb), 0.1),
+    rgba(var(--color-teal-500-rgb), 0.1)
+  );
+  opacity: 0.4;
+  will-change: transform;
+}
+
+.shape-1 {
+  width: 80px;
+  height: 80px;
+  top: 20%;
+  left: 10%;
+  animation: float 6s ease-in-out infinite;
+}
+
+.shape-2 {
+  width: 120px;
+  height: 120px;
+  top: 60%;
+  left: 80%;
+  animation: floatReverse 8s ease-in-out infinite;
+}
+
+.shape-3 {
+  width: 60px;
+  height: 60px;
+  top: 80%;
+  left: 20%;
+  animation: drift 10s ease-in-out infinite;
+}
+
+.shape-4 {
+  width: 100px;
+  height: 100px;
+  top: 10%;
+  left: 70%;
+  animation: pulse 4s ease-in-out infinite;
+}
+
+.shape-5 {
+  width: 90px;
+  height: 90px;
+  top: 40%;
+  left: 5%;
+  animation: float 7s ease-in-out infinite;
+}
+
+.shape-6 {
+  width: 70px;
+  height: 70px;
+  top: 70%;
+  left: 60%;
+  animation: floatReverse 9s ease-in-out infinite;
+}
+
+.shape-7 {
+  width: 110px;
+  height: 110px;
+  top: 30%;
+  left: 90%;
+  animation: drift 12s ease-in-out infinite;
+}
+
+.shape-8 {
+  width: 50px;
+  height: 50px;
+  top: 90%;
+  left: 40%;
+  animation: pulse 5s ease-in-out infinite;
+}
+
+.gradient-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    rgba(var(--color-primary-rgb), 0.02) 0%,
+    rgba(var(--color-teal-500-rgb), 0.02) 50%,
+    rgba(var(--color-primary-rgb), 0.02) 100%
+  );
+  opacity: 0.6;
+}
+
+:host-context([data-color-scheme="dark"]) .shape,
+[data-color-scheme="dark"] .shape {
+  background: linear-gradient(
+    135deg,
+    rgba(var(--color-teal-500-rgb), 0.15),
+    rgba(var(--color-primary-rgb), 0.15)
+  );
+  opacity: 0.3;
+}
+
+:host-context([data-color-scheme="dark"]) .gradient-overlay,
+[data-color-scheme="dark"] .gradient-overlay {
+  background: linear-gradient(
+    135deg,
+    rgba(var(--color-teal-500-rgb), 0.03) 0%,
+    rgba(var(--color-primary-rgb), 0.03) 50%,
+    rgba(var(--color-teal-500-rgb), 0.03) 100%
+  );
+  opacity: 0.8;
+}

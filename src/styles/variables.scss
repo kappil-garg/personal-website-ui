@@ -1,7 +1,6 @@
-@import url("https://fonts.googleapis.com/css2?family=Roboto&family=Poppins:wght@600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600&family=Fira+Code:wght@400;500&family=Source+Code+Pro:wght@400;500&display=swap");
 
 :root {
-  // Color Tokens
   --color-cream-50: rgba(252, 252, 249, 1);
   --color-cream-100: rgba(255, 255, 253, 1);
   --color-gray-200: rgba(245, 245, 245, 1);
@@ -19,13 +18,14 @@
   --color-teal-700: rgba(26, 104, 115, 1);
   --color-teal-800: rgba(41, 150, 161, 1);
 
-  // RGB Values for Opacity Control
   --color-brown-600-rgb: 94, 82, 64;
-  --color-teal-500-rgb: 33, 128, 141;
+  --color-teal-500-rgb: 20, 184, 166;
   --color-slate-900-rgb: 19, 52, 59;
   --color-slate-500-rgb: 98, 108, 113;
+  --color-primary-rgb: 33, 128, 141;
+  --color-white-rgb: 255, 255, 255;
+  --color-black-rgb: 0, 0, 0;
 
-  // Semantic Colors
   --color-background: var(--color-cream-50);
   --color-surface: var(--color-cream-100);
   --color-text: var(--color-slate-900);
@@ -33,25 +33,19 @@
   --color-primary: var(--color-teal-500);
   --color-primary-hover: var(--color-teal-600);
   --color-primary-active: var(--color-teal-700);
-  --color-secondary: rgba(var(--color-brown-600-rgb), 0.12);
-  --color-secondary-hover: rgba(var(--color-brown-600-rgb), 0.2);
-  --color-secondary-active: rgba(var(--color-brown-600-rgb), 0.25);
   --color-border: rgba(var(--color-brown-600-rgb), 0.2);
-  --color-focus-ring: rgba(var(--color-teal-500-rgb), 0.4);
 
-  // Component Variables
-  --navbar-bg: var(--color-surface);
-  --border-color: var(--color-border);
-  --portfolio-primary: var(--color-primary);
-  --text-secondary: var(--color-text-secondary);
-
-  // Typography
   --font-family-base:
-    "Roboto", "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
+    "Inter", "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-family-heading:
-    "Poppins", "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    "Poppins", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
+  --font-family-elegant:
+    "Playfair Display", "Georgia", "Times New Roman", serif;
+  --font-family-navigation:
+    "Noto Sans", "Fira Code", "Source Code Pro", "Consolas", "Monaco",
+    "Courier New", monospace;
+  --font-size-navigation: 18px;
 
   --font-size-sm: 12px;
   --font-size-base: 14px;
@@ -70,30 +64,28 @@
   --line-height-normal: 1.5;
   --letter-spacing-tight: -0.01em;
 
-  // Spacing
-  --space-4: 4px;
-  --space-12: 12px;
-  --space-16: 16px;
-  --space-20: 20px;
-  --space-24: 24px;
-  --space-32: 32px;
-  --space-34: 34px;
-  --space-48: 48px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
 
-  // Border Radius
   --radius-base: 8px;
   --radius-full: 9999px;
 
-  // Shadows
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
-  --shadow-lg:
-    0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
-
-  // Animation
   --duration-fast: 150ms;
   --duration-normal: 250ms;
+  --duration-slow: 4000ms;
   --ease-standard: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
 
-  // Layout
-  --container-lg: 1024px;
+  --navbar-height: 70px;
+  --container-lg: 1400px;
+  --hero-top-spacing: 50px;
+  --hero-top-spacing-mobile: 70px;
 }
