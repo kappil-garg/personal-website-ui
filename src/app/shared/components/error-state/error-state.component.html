@@ -1,0 +1,12 @@
+<div class="error-container">
+  <div class="error-icon">
+    <i [class]="icon"></i>
+  </div>
+  <h3 class="error-title">{{ title }}</h3>
+  <p class="error-message">{{ message }}</p>
+  @if (showRetry) {
+    <button class="retry-btn" (click)="retry.emit()">
+      {{ retryText }}
+    </button>
+  }
+</div>

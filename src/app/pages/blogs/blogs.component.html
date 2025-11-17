@@ -1,10 +1,231 @@
-<section class="section container hero-container">
-  <div class="coming-soon-container">
-    <div class="coming-soon-icon">📝</div>
-    <h2 class="coming-soon-title">Blogs</h2>
-    <p class="coming-soon-text">This section is coming soon!</p>
-    <div class="coming-soon-description">
-      My thoughts, tutorials, and insights about technology will be shared here.
+<section class="blogs-section section">
+  <!-- Hero Section -->
+  <div class="blogs-hero">
+    <div class="container">
+      <div class="hero-content">
+        <h1 class="hero-title">My Blog</h1>
+        <p class="hero-subtitle">
+          Thoughts, insights, and experiences from my journey in technology,
+          life, and career.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="container">
+    <div class="blogs-layout">
+      <!-- Sidebar -->
+      <aside class="blogs-sidebar">
+        <!-- Category Filter -->
+        <div class="filter-section">
+          <h3 class="filter-title">Categories</h3>
+          <div class="category-filters">
+            @for (category of categories(); track category.key) {
+              <button
+                class="category-filter"
+                [class.active]="selectedCategory() === category.key"
+                [attr.aria-pressed]="selectedCategory() === category.key"
+                [attr.aria-label]="
+                  'Filter by ' +
+                  category.label +
+                  ' (' +
+                  category.count +
+                  ' posts)'
+                "
+                (click)="onCategoryClick(category.key)"
+                (keydown)="
+                  onKeyDown($event, onCategoryClick.bind(this, category.key))
+                "
+                tabindex="0"
+              >
+                <span class="category-icon">
+                  <i [class]="category.iconClass"></i>
+                </span>
+                <span class="category-label">{{ category.label }}</span>
+                <span class="category-count">{{ category.count }}</span>
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Search & Sort -->
+        <div class="filter-section">
+          <h3 class="filter-title">Search & Sort</h3>
+
+          <!-- Search -->
+          <div class="search-container">
+            <input
+              type="text"
+              class="search-input"
+              placeholder="Search blogs..."
+              [value]="searchTerm()"
+              aria-label="Search blog posts"
+              (input)="onSearchInput($event)"
+            />
+            <i class="fas fa-search search-icon"></i>
+          </div>
+
+          <!-- Sort Options -->
+          <div class="sort-container">
+            <label class="sort-label">Sort by:</label>
+            <select
+              class="sort-select"
+              [value]="sortBy()"
+              (change)="onSortByChange($event)"
+            >
+              <option value="publishedAt">Date Published</option>
+              <option value="viewCount">Most Popular</option>
+              <option value="readingTime">Reading Time</option>
+            </select>
+          </div>
+
+          <div class="sort-order">
+            <button
+              class="sort-order-btn"
+              [class.active]="sortOrder() === 'desc'"
+              (click)="updateSortOrder('desc')"
+            >
+              <i class="fas fa-sort-amount-down"></i>
+              Newest First
+            </button>
+            <button
+              class="sort-order-btn"
+              [class.active]="sortOrder() === 'asc'"
+              (click)="updateSortOrder('asc')"
+            >
+              <i class="fas fa-sort-amount-up"></i>
+              Oldest First
+            </button>
+          </div>
+
+          <!-- Clear Filters -->
+          <button class="clear-filters-btn" (click)="clearFilters()">
+            Clear All Filters
+          </button>
+        </div>
+      </aside>
+
+      <!-- Main Content Area -->
+      <main class="blogs-main">
+        <!-- Loading State -->
+        @if (loading()) {
+          <app-loading-spinner message="Loading blogs..." />
+        }
+
+        <!-- Error State -->
+        @if (error()) {
+          <app-error-state
+            [message]="error() || 'An error occurred'"
+            (onRetry)="retryFetchBlogs()"
+          />
+        }
+
+        <!-- Empty State -->
+        @if (!loading() && !error() && filteredBlogs().length === 0) {
+          <div class="empty-state">
+            <div class="empty-icon">
+              <i class="fas fa-file-alt"></i>
+            </div>
+            @if (blogService.blogs().length === 0) {
+              <h3>No blogs yet</h3>
+              <p>Check back soon for new blog posts!</p>
+            } @else {
+              <h3>No blogs found</h3>
+              <p>
+                No blogs match your current filters. Try adjusting your search
+                criteria.
+              </p>
+              <button class="clear-filters-btn" (click)="clearFilters()">
+                Clear Filters
+              </button>
+            }
+          </div>
+        }
+
+        <!-- Blog Posts -->
+        @if (!loading() && !error() && filteredBlogs().length > 0) {
+          <div class="blogs-grid">
+            @for (blog of filteredBlogs(); track $index; let i = $index) {
+              <article class="blog-card" [attr.data-category]="blog.category">
+                <!-- Featured Image -->
+                @if (blog.featuredImage) {
+                  <div class="blog-image">
+                    <img [src]="blog.featuredImage" [alt]="blog.title" />
+                  </div>
+                } @else {
+                  <div class="blog-image-placeholder">
+                    <div class="placeholder-content">
+                      <span class="placeholder-icon">
+                        <i [class]="getCategoryIcon(blog.category)"></i>
+                      </span>
+                      <span class="placeholder-text">{{
+                        getCategoryLabel(blog.category)
+                      }}</span>
+                    </div>
+                  </div>
+                }
+
+                <!-- Blog Content -->
+                <div class="blog-content">
+                  <!-- Category Badge -->
+                  @if (blog.category) {
+                    <div class="blog-category">
+                      <span class="category-icon">
+                        <i [class]="getCategoryIcon(blog.category)"></i>
+                      </span>
+                      <span class="category-name">{{
+                        getCategoryLabel(blog.category)
+                      }}</span>
+                    </div>
+                  }
+
+                  <!-- Title -->
+                  <h2 class="blog-title">
+                    <a [routerLink]="['/blogs', blog.slug]">{{ blog.title }}</a>
+                  </h2>
+
+                  <!-- Excerpt -->
+                  <p class="blog-excerpt">{{ blog.excerpt }}</p>
+
+                  <!-- Meta Information -->
+                  <div class="blog-meta">
+                    <div class="meta-item">
+                      <i class="fas fa-calendar-alt meta-icon"></i>
+                      <span class="meta-text">{{
+                        blog.publishedAt
+                          ? formatDate(blog.publishedAt)
+                          : "Not published"
+                      }}</span>
+                    </div>
+                    <div class="meta-item">
+                      <i class="fas fa-clock meta-icon"></i>
+                      <span class="meta-text"
+                        >{{ blog.readingTime }} min read</span
+                      >
+                    </div>
+                    <div class="meta-item">
+                      <i class="fas fa-eye meta-icon"></i>
+                      <span class="meta-text">{{ blog.viewCount }} views</span>
+                    </div>
+                  </div>
+
+                  <!-- Read More Button -->
+                  <div class="blog-actions">
+                    <a
+                      [routerLink]="['/blogs', blog.slug]"
+                      class="read-more-btn"
+                    >
+                      Read More
+                      <i class="fas fa-arrow-right btn-icon"></i>
+                    </a>
+                  </div>
+                </div>
+              </article>
+            }
+          </div>
+        }
+      </main>
     </div>
   </div>
 </section>

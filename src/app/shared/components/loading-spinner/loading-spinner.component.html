@@ -1,0 +1,12 @@
+<div
+  class="loading-container"
+  [class.small]="size === 'small'"
+  [class.large]="size === 'large'"
+>
+  <div class="loading-spinner">
+    <i class="fas fa-spinner fa-spin"></i>
+  </div>
+  @if (message) {
+    <p class="loading-message">{{ message }}</p>
+  }
+</div>

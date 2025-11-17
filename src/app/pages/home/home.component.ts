@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { PortfolioService } from '../../services/portfolio.service';
 import { PersonalInfo } from '../../models/portfolio.interface';
+import { EnvironmentService } from '../../shared/services/environment.service';
 
 @Component({
   selector: 'app-home',
@@ -15,6 +16,7 @@ export class HomeComponent implements OnInit {
 
   private router = inject(Router);
   private portfolioService = inject(PortfolioService);
+  private environmentService = inject(EnvironmentService);
 
   personalInfo = signal<PersonalInfo | null>(null);
 
@@ -28,7 +30,7 @@ export class HomeComponent implements OnInit {
         this.personalInfo.set(data);
       },
       error: (err) => {
-        console.error('Failed to load personal info:', err);
+        this.environmentService.warn('Failed to load personal info:', err);
       },
     });
   }
