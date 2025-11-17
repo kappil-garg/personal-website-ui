@@ -1,15 +1,14 @@
 @use "./styles/variables.scss";
-@use "./styles/mixins.scss";
 @use "./styles/themes.scss";
 @use "./styles/base.scss";
 @use "./styles/layout.scss";
 @use "./styles/components.scss";
-@use "./styles/utilities.scss";
 @use "./styles/breakpoints.scss";
 @use "./styles/animations.scss";
 @use "./styles/background.scss";
+@use "./styles/blog-content.scss";
 
-@layer reset, base, layout, components, utilities, themes;
+@layer reset, base, layout, components, themes;
 
 .main-content {
   position: relative;

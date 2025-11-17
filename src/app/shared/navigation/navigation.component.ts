@@ -26,6 +26,7 @@ export class NavigationComponent implements OnDestroy {
 
   currentRoute = signal('');
   isMobileMenuOpen = signal(false);
+  isScrolled = signal(false);
   navigationItems = signal<NavigationItem[]>(NAVIGATION_ITEMS);
 
   constructor() {
@@ -37,6 +38,16 @@ export class NavigationComponent implements OnDestroy {
     if (this.isMobileMenuOpen()) {
       this.closeMobileMenu();
     }
+  }
+
+  @HostListener('window:scroll')
+  onWindowScroll(): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+    
+    const scrollY = window.scrollY;
+    this.isScrolled.set(scrollY > 10);
   }
 
   private setupRouteTracking(): void {

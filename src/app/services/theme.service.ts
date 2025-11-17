@@ -1,5 +1,6 @@
-import { Injectable, signal, effect, PLATFORM_ID, Inject } from '@angular/core';
+import { Injectable, signal, effect, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { EnvironmentService } from '../shared/services/environment.service';
 
 export type ThemeMode = 'light' | 'dark';
 
@@ -10,11 +11,13 @@ export class ThemeService {
 
   private readonly isBrowser: boolean;
   private readonly storageKey = 'portfolio-theme';
+  private readonly platformId = inject(PLATFORM_ID);
+  private readonly environmentService = inject(EnvironmentService);
 
   isInitializing = signal(true);
   currentTheme = signal<ThemeMode>('light');
 
-  constructor(@Inject(PLATFORM_ID) private platformId: object) {
+  constructor() {
     this.isBrowser = isPlatformBrowser(this.platformId);
     this.initializeTheme();
     effect(() => {
@@ -39,7 +42,7 @@ export class ThemeService {
         this.currentTheme.set(prefersDark ? 'dark' : 'light');
       }
     } catch (error) {
-      console.warn('Failed to initialize theme:', error);
+      this.environmentService.warn('Failed to initialize theme:', error);
       this.currentTheme.set('light');
     } finally {
       this.isInitializing.set(false);
@@ -56,7 +59,7 @@ export class ThemeService {
       localStorage.setItem(this.storageKey, theme);
       this.updateMetaThemeColor(theme);
     } catch (error) {
-      console.warn('Failed to apply theme:', error);
+      this.environmentService.warn('Failed to apply theme:', error);
     }
   }
 

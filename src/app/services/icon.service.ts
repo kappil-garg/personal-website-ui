@@ -1,11 +1,15 @@
 import { Injectable } from '@angular/core';
 
+/**
+ * Service for managing icons throughout the application.
+ * Provides consistent icon mapping for navigation items.
+ */
 @Injectable({
   providedIn: 'root',
 })
 export class IconService {
 
-  private readonly iconMap = new Map<string, string>([
+  private readonly navigationIconMap = new Map<string, string>([
     ['home', 'fas fa-home'],
     ['about-me', 'fas fa-heart'],
     ['experience', 'fas fa-briefcase'],
@@ -24,16 +28,7 @@ export class IconService {
    * @returns The FontAwesome icon class, or a default circle icon if not found
    */
   getIconClass(id: string): string {
-    return this.iconMap.get(id) || 'fas fa-circle';
-  }
-
-  /**
-   * Get all available icon mappings
-   * 
-   * @returns A copy of the icon map for reference
-   */
-  getAllIcons(): Map<string, string> {
-    return new Map(this.iconMap);
+    return this.navigationIconMap.get(id) || 'fas fa-circle';
   }
 
 }

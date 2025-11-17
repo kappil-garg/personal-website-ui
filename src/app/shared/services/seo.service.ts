@@ -1,0 +1,144 @@
+import { Injectable, inject } from '@angular/core';
+import { Title, Meta } from '@angular/platform-browser';
+import { DOCUMENT } from '@angular/common';
+import { Blog } from '../../models/blog.interface';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class SeoService {
+
+  private meta = inject(Meta);
+  private title = inject(Title);
+  private document = inject(DOCUMENT);
+
+  private readonly author = 'Kapil Garg';
+  private readonly baseUrl = 'https://kappilgarg.dev';
+  private readonly defaultImage = 'https://kappilgarg.dev/assets/images/profile-pic.png';
+  private readonly defaultTitle = 'Kapil Garg - Java Full Stack Developer & Tech Explorer';
+  private readonly defaultDescription = 'Full Stack Java Developer with 8+ years of experience in enterprise-grade software solutions. Specialized in Spring Boot, Angular, and modern web technologies.';
+
+  setBlogPostMetaTags(blog: Blog): void {
+
+    const title = `${blog.title} - Kapil Garg`;
+    const url = `${this.baseUrl}/blogs/${blog.slug}`;
+    const image = blog.featuredImage || this.defaultImage;
+    const description = blog.excerpt || this.defaultDescription;
+
+    const modifiedTime = blog.updatedAt;
+    const publishedTime = blog.publishedAt || blog.createdAt;
+    
+    this.title.setTitle(title);
+
+    this.updateOrCreateMetaTag('name', 'description', description);
+    this.updateOrCreateMetaTag('name', 'author', this.author);
+    this.updateOrCreateMetaTag('name', 'keywords', this.generateKeywords(blog));
+
+    this.updateOrCreateMetaTag('property', 'og:type', 'article');
+    this.updateOrCreateMetaTag('property', 'og:title', title);
+    this.updateOrCreateMetaTag('property', 'og:description', description);
+    this.updateOrCreateMetaTag('property', 'og:image', image);
+    this.updateOrCreateMetaTag('property', 'og:url', url);
+    this.updateOrCreateMetaTag('property', 'og:site_name', 'Kapil Garg');
+    this.updateOrCreateMetaTag('property', 'og:locale', 'en_US');
+
+    if (publishedTime) {
+      this.updateOrCreateMetaTag(
+        'property',
+        'article:published_time',
+        publishedTime,
+      );
+    }
+
+    if (modifiedTime) {
+      this.updateOrCreateMetaTag(
+        'property',
+        'article:modified_time',
+        modifiedTime,
+      );
+    }
+
+    if (blog.category) {
+      this.updateOrCreateMetaTag('property', 'article:section', blog.category);
+    }
+
+    this.updateOrCreateMetaTag('name', 'twitter:card', 'summary_large_image');
+    this.updateOrCreateMetaTag('name', 'twitter:title', title);
+    this.updateOrCreateMetaTag('name', 'twitter:description', description);
+    this.updateOrCreateMetaTag('name', 'twitter:image', image);
+    this.updateOrCreateMetaTag('name', 'twitter:site', '@KappilGarg');
+    this.updateOrCreateMetaTag('name', 'twitter:creator', '@KappilGarg');
+
+    this.updateOrCreateLinkTag('canonical', url);
+    this.updateOrCreateMetaTag('property', 'article:author', this.author);
+
+  }
+
+  setBlogsListingMetaTags(): void {
+    const title = 'Blogs - Kapil Garg';
+    const url = `${this.baseUrl}/blogs`;
+    const description = 'Read my thoughts, insights, and experiences from my journey in technology, life, and career. Technical tutorials, career advice, and personal stories.';
+    this.title.setTitle(title);
+    this.updateOrCreateMetaTag('name', 'description', description);
+    this.updateOrCreateMetaTag('property', 'og:type', 'website');
+    this.updateOrCreateMetaTag('property', 'og:title', title);
+    this.updateOrCreateMetaTag('property', 'og:description', description);
+    this.updateOrCreateMetaTag('property', 'og:url', url);
+    this.updateOrCreateMetaTag('property', 'og:image', this.defaultImage);
+    this.updateOrCreateMetaTag('name', 'twitter:card', 'summary_large_image');
+    this.updateOrCreateMetaTag('name', 'twitter:title', title);
+    this.updateOrCreateMetaTag('name', 'twitter:description', description);
+    this.updateOrCreateMetaTag('name', 'twitter:image', this.defaultImage);
+    this.updateOrCreateLinkTag('canonical', url);
+  }
+
+  setDefaultMetaTags(): void {
+    this.title.setTitle(this.defaultTitle);
+    this.updateOrCreateMetaTag('name', 'description', this.defaultDescription);
+    this.updateOrCreateMetaTag('property', 'og:type', 'website');
+    this.updateOrCreateMetaTag('property', 'og:title', this.defaultTitle);
+    this.updateOrCreateMetaTag('property', 'og:description', this.defaultDescription);
+    this.updateOrCreateMetaTag('property', 'og:url', this.baseUrl);
+    this.updateOrCreateMetaTag('property', 'og:image', this.defaultImage);
+    this.updateOrCreateMetaTag('name', 'twitter:card', 'summary_large_image');
+    this.updateOrCreateMetaTag('name', 'twitter:title', this.defaultTitle);
+    this.updateOrCreateMetaTag('name', 'twitter:description', this.defaultDescription);
+    this.updateOrCreateMetaTag('name', 'twitter:image', this.defaultImage);
+  }
+
+  private updateOrCreateMetaTag(
+    attribute: 'name' | 'property',
+    selector: string,
+    content: string,
+  ): void {
+    const existingTag = this.meta.getTag(`${attribute}="${selector}"`);
+    if (existingTag) {
+      this.meta.updateTag({ [attribute]: selector, content });
+    } else {
+      this.meta.addTag({ [attribute]: selector, content });
+    }
+  }
+
+  private updateOrCreateLinkTag(rel: string, href: string): void {
+    const linkTag = this.document.querySelector(
+      `link[rel="${rel}"]`,
+    ) as HTMLLinkElement | null;
+    if (linkTag) {
+      linkTag.setAttribute('href', href);
+    } else {
+      const newLinkTag = this.document.createElement('link');
+      newLinkTag.setAttribute('rel', rel);
+      newLinkTag.setAttribute('href', href);
+      this.document.head.appendChild(newLinkTag);
+    }
+  }
+
+  private generateKeywords(blog: Blog): string {
+    const baseKeywords = 'Kapil Garg, Java Developer, Full Stack Developer, Spring Boot, Angular, Blog';
+    const categoryKeywords = blog.category
+      ? `${blog.category.toLowerCase()}, `
+      : '';
+    return `${categoryKeywords}${baseKeywords}`;
+  }
+
+}

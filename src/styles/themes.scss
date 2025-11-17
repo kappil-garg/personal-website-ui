@@ -18,6 +18,10 @@
   --color-secondary-active: rgba(var(--color-gray-400-rgb), 0.3);
   --color-border: rgba(var(--color-gray-400-rgb), 0.3);
   --color-focus-ring: rgba(var(--color-teal-300-rgb), 0.4);
+  --color-code-bg: rgba(var(--color-gray-400-rgb), 0.15);
+  --color-code-text: var(--color-gray-200);
+  --color-code-inline-bg: rgba(var(--color-teal-300-rgb), 0.15);
+  --color-code-inline-text: var(--color-teal-300);
 
   --navbar-bg: var(--color-surface);
   --border-color: var(--color-border);

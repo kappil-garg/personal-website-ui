@@ -12,4 +12,6 @@ router-outlet {
 
 .main-content {
   flex: 1;
+  position: relative;
+  z-index: 1;
 }
