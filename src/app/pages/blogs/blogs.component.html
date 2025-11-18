@@ -117,7 +117,7 @@
         @if (error()) {
           <app-error-state
             [message]="error() || 'An error occurred'"
-            (onRetry)="retryFetchBlogs()"
+            (retry)="retryFetchBlogs()"
           />
         }
 

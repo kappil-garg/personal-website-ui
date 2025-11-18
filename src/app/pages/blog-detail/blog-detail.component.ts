@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Subject, takeUntil } from 'rxjs';
+import DOMPurify from 'dompurify';
 import { BlogService } from '../../services/blog.service';
 import { CategoryConfigService } from '../../services/category-config.service';
 import { Blog } from '../../models/blog.interface';
@@ -55,13 +56,16 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
   authorInfo = computed(() => this.portfolioService.personalInfo());
 
   /**
-   * Bypasses Angular sanitization for blog content HTML
-   * Safe to use since content comes from our own trusted database
+   * Sanitizes and returns blog content HTML for safe rendering.
+   * Uses DOMPurify to sanitize HTML before rendering to prevent XSS attacks.
    */
   getSanitizedContent(): SafeHtml | null {
     const content = this.blog()?.content;
     if (!content) return null;
-    return this.sanitizer.bypassSecurityTrustHtml(content);
+    const sanitized = typeof window !== 'undefined' 
+      ? DOMPurify.sanitize(content) 
+      : content;
+    return this.sanitizer.bypassSecurityTrustHtml(sanitized);
   }
 
   constructor() {

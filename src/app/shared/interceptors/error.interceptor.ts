@@ -4,8 +4,8 @@ import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { EnvironmentService } from '../services/environment.service';
 
-type HttpRequestType = HttpRequest<unknown>;
 type HttpEventType = HttpEvent<unknown>;
+type HttpRequestType = HttpRequest<unknown>;
 
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {
@@ -15,9 +15,8 @@ export class ErrorInterceptor implements HttpInterceptor {
   intercept(req: HttpRequestType, next: HttpHandler): Observable<HttpEventType> {
     return next.handle(req).pipe(
       catchError((error: HttpErrorResponse) => {
-        let errorMessage = 'An unexpected error occurred';
-        let errorCode = 'UNKNOWN_ERROR';
-
+        let errorCode;
+        let errorMessage;
         // Handle different types of HTTP errors
         if (error.error instanceof ErrorEvent) {
           // Client-side error
@@ -71,7 +70,6 @@ export class ErrorInterceptor implements HttpInterceptor {
               errorCode = 'HTTP_ERROR';
           }
         }
-
         // Log error in development mode
         this.environmentService.warn('HTTP Error Interceptor:', {
           url: req.url,
@@ -82,7 +80,6 @@ export class ErrorInterceptor implements HttpInterceptor {
           message: errorMessage,
           code: errorCode
         });
-
         // Create a standardized error response
         const standardizedError = {
           message: errorMessage,
@@ -92,9 +89,9 @@ export class ErrorInterceptor implements HttpInterceptor {
           timestamp: new Date().toISOString(),
           originalError: this.environmentService.isDebugModeEnabled ? error : undefined
         };
-
         return throwError(() => standardizedError);
       })
     );
   }
+
 }
