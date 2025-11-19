@@ -1,9 +1,9 @@
 import { Injectable, signal, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of, catchError, map } from 'rxjs';
+import { Observable, of, catchError, finalize, map } from 'rxjs';
 import { Blog, BlogFilters } from '../models/blog.interface';
 import { ApiResponse } from '../models/api-response.interface';
-import { APP_CONSTANTS } from '../shared/constants/app.constants';
+import { APP_CONSTANTS, SortOption, SortOrder } from '../shared/constants/app.constants';
 import { StringUtils } from '../shared/utils/string.utils';
 import { environment } from '../../environments/environment';
 import { EnvironmentService } from '../shared/services/environment.service';
@@ -22,7 +22,13 @@ export class BlogService {
   private loadingSignal = signal<boolean>(false);
   private errorSignal = signal<string | null>(null);
 
-  fetchBlogs(): Observable<Blog[]> {
+  private hasFetched = false;
+
+  fetchBlogs(options: { forceRefresh?: boolean } = {}): Observable<Blog[]> {
+    const shouldUseCache = !options.forceRefresh && this.hasFetched;
+    if (shouldUseCache) {
+      return of(this.blogsSignal());
+    }
     this.loadingSignal.set(true);
     return this.http.get<ApiResponse<Blog[]>>(`${this.API_BASE_URL}/published`).pipe(
       map(response => {
@@ -31,19 +37,21 @@ export class BlogService {
           index === self.findIndex(b => b.slug === blog.slug)
         );
         this.blogsSignal.set(uniqueBlogs);
-        this.loadingSignal.set(false);
         this.errorSignal.set(null);
+        this.hasFetched = true;
         return uniqueBlogs;
       }),
       catchError(error => {
         this.environmentService.warn('Error fetching blogs:', error);
-        this.loadingSignal.set(false);
         if (this.blogsSignal().length === 0) {
           this.errorSignal.set('Failed to load blogs. Please try again later.');
         } else {
           this.errorSignal.set(null);
         }
         return of(this.blogsSignal());
+      }),
+      finalize(() => {
+        this.loadingSignal.set(false);
       })
     );
   }
@@ -81,12 +89,13 @@ export class BlogService {
       );
     }
     if (filters.sortBy) {
-      filteredBlogs.sort((a, b) => this.compareBlogs(a, b, filters.sortBy!, filters.sortOrder || APP_CONSTANTS.BLOG.SORT_ORDERS.DESC));
+      const sortOrder = filters.sortOrder || APP_CONSTANTS.BLOG.SORT_ORDERS.DESC;
+      filteredBlogs.sort((a, b) => this.compareBlogs(a, b, filters.sortBy as SortOption, sortOrder));
     }
     return filteredBlogs;
   }
 
-  private compareBlogs(a: Blog, b: Blog, sortBy: string, sortOrder: string): number {
+  private compareBlogs(a: Blog, b: Blog, sortBy: SortOption, sortOrder: SortOrder): number {
     let aValue: number, bValue: number;
     switch (sortBy) {
       case APP_CONSTANTS.BLOG.SORT_OPTIONS.PUBLISHED_AT:

@@ -22,9 +22,15 @@ export class SeoService {
 
     const title = `${blog.title} - Kapil Garg`;
     const url = `${this.baseUrl}/blogs/${blog.slug}`;
-    const image = blog.featuredImage || this.defaultImage;
     const description = blog.excerpt || this.defaultDescription;
 
+    let image = blog.featuredImage || this.defaultImage;
+    if (image && !image.startsWith('http://') && !image.startsWith('https://')) {
+      image = image.startsWith('/') 
+        ? `${this.baseUrl}${image}` 
+        : `${this.baseUrl}/${image}`;
+    }
+    
     const modifiedTime = blog.updatedAt;
     const publishedTime = blog.publishedAt || blog.createdAt;
     
@@ -37,7 +43,11 @@ export class SeoService {
     this.updateOrCreateMetaTag('property', 'og:type', 'article');
     this.updateOrCreateMetaTag('property', 'og:title', title);
     this.updateOrCreateMetaTag('property', 'og:description', description);
-    this.updateOrCreateMetaTag('property', 'og:image', image);
+    this.updateOrCreateMetaTag('property', 'og:image:url', image);
+    this.updateOrCreateMetaTag('property', 'og:image:width', '1200');
+    this.updateOrCreateMetaTag('property', 'og:image:height', '630');
+    this.updateOrCreateMetaTag('property', 'og:image:alt', title);
+    this.updateOrCreateMetaTag('property', 'og:image:type', this.getImageType(image));
     this.updateOrCreateMetaTag('property', 'og:url', url);
     this.updateOrCreateMetaTag('property', 'og:site_name', 'Kapil Garg');
     this.updateOrCreateMetaTag('property', 'og:locale', 'en_US');
@@ -85,6 +95,9 @@ export class SeoService {
     this.updateOrCreateMetaTag('property', 'og:description', description);
     this.updateOrCreateMetaTag('property', 'og:url', url);
     this.updateOrCreateMetaTag('property', 'og:image', this.defaultImage);
+    this.updateOrCreateMetaTag('property', 'og:image:width', '1200');
+    this.updateOrCreateMetaTag('property', 'og:image:height', '630');
+    this.updateOrCreateMetaTag('property', 'og:image:alt', title);
     this.updateOrCreateMetaTag('name', 'twitter:card', 'summary_large_image');
     this.updateOrCreateMetaTag('name', 'twitter:title', title);
     this.updateOrCreateMetaTag('name', 'twitter:description', description);
@@ -100,6 +113,9 @@ export class SeoService {
     this.updateOrCreateMetaTag('property', 'og:description', this.defaultDescription);
     this.updateOrCreateMetaTag('property', 'og:url', this.baseUrl);
     this.updateOrCreateMetaTag('property', 'og:image', this.defaultImage);
+    this.updateOrCreateMetaTag('property', 'og:image:width', '1200');
+    this.updateOrCreateMetaTag('property', 'og:image:height', '630');
+    this.updateOrCreateMetaTag('property', 'og:image:alt', this.defaultTitle);
     this.updateOrCreateMetaTag('name', 'twitter:card', 'summary_large_image');
     this.updateOrCreateMetaTag('name', 'twitter:title', this.defaultTitle);
     this.updateOrCreateMetaTag('name', 'twitter:description', this.defaultDescription);
@@ -139,6 +155,19 @@ export class SeoService {
       ? `${blog.category.toLowerCase()}, `
       : '';
     return `${categoryKeywords}${baseKeywords}`;
+  }
+
+  private getImageType(imageUrl: string): string {
+    const extension = imageUrl.split('.').pop()?.toLowerCase() || 'png';
+    const typeMap: Record<string, string> = {
+      'jpg': 'image/jpeg',
+      'jpeg': 'image/jpeg',
+      'png': 'image/png',
+      'gif': 'image/gif',
+      'webp': 'image/webp',
+      'svg': 'image/svg+xml',
+    };
+    return typeMap[extension] || 'image/png';
   }
 
 }

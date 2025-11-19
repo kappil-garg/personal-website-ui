@@ -1,7 +1,8 @@
-import { Component, OnInit, OnDestroy, signal, computed, ChangeDetectionStrategy, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, computed, ChangeDetectionStrategy, inject, ChangeDetectorRef, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { BlogService } from '../../services/blog.service';
 import { CategoryConfigService } from '../../services/category-config.service';
 import { BlogCategory, BlogFilters } from '../../models/blog.interface';
@@ -27,11 +28,13 @@ import { SeoService } from '../../shared/services/seo.service';
 })
 export class BlogsComponent implements OnInit, OnDestroy {
   
+  private destroyRef = inject(DestroyRef);
   private cdr = inject(ChangeDetectorRef);
+  
+  private seoService = inject(SeoService);
   public blogService = inject(BlogService);
   private environmentService = inject(EnvironmentService);
   private categoryConfigService = inject(CategoryConfigService);
-  private seoService = inject(SeoService);
 
   private searchTermSignal = signal<string>('');
 
@@ -111,8 +114,9 @@ export class BlogsComponent implements OnInit, OnDestroy {
   }
 
   private loadBlogs(): void {
-    // Always fetch all blogs to maintain accurate category counts
-    this.blogService.fetchBlogs().subscribe({
+    this.blogService.fetchBlogs().pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
       next: () => {
         this.cdr.markForCheck();
       },
@@ -127,7 +131,6 @@ export class BlogsComponent implements OnInit, OnDestroy {
     this.selectedCategorySignal.set(
       categoryKey as BlogCategory | typeof APP_CONSTANTS.CATEGORIES.ALL,
     );
-    this.loadBlogs();
   }
 
   onSearchInput(event: Event): void {
@@ -168,7 +171,9 @@ export class BlogsComponent implements OnInit, OnDestroy {
   }
 
   retryFetchBlogs(): void {
-    this.blogService.fetchBlogs().subscribe();
+    this.blogService.fetchBlogs({ forceRefresh: true }).pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe();
   }
 
   onKeyDown(event: KeyboardEvent, action: () => void): void {

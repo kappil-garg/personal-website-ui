@@ -143,9 +143,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Kapil Garg** - Full Stack Java Developer with 8+ years of experience in enterprise-grade software solutions. Specialized in Spring Boot, Angular, and modern web technologies.
 
 - **Location**: India
-- **Website**: [kapilgarg.dev](https://kapilgarg.dev)
+- **Website**: [kappilgarg.dev](https://kappilgarg.dev)
 - **GitHub**: [Follow on GitHub](https://github.com/kappil-garg)
-- **LinkedIn**: [Connect on LinkedIn](https://linkedin.com/in/kappil-garg)
+- **LinkedIn**: [Connect on LinkedIn](https://www.linkedin.com/in/kappil-garg)
 
 ---
 
