@@ -43,7 +43,7 @@ export class SeoService {
     this.updateOrCreateMetaTag('property', 'og:type', 'article');
     this.updateOrCreateMetaTag('property', 'og:title', title);
     this.updateOrCreateMetaTag('property', 'og:description', description);
-    this.updateOrCreateMetaTag('property', 'og:image:url', image);
+    this.updateOrCreateMetaTag('property', 'og:image', image);
     this.updateOrCreateMetaTag('property', 'og:image:width', '1200');
     this.updateOrCreateMetaTag('property', 'og:image:height', '630');
     this.updateOrCreateMetaTag('property', 'og:image:alt', title);
@@ -158,7 +158,8 @@ export class SeoService {
   }
 
   private getImageType(imageUrl: string): string {
-    const extension = imageUrl.split('.').pop()?.toLowerCase() || 'png';
+    const sanitizedUrl = imageUrl.split('?')[0];
+    const extension = sanitizedUrl.split('.').pop()?.toLowerCase() || 'png';
     const typeMap: Record<string, string> = {
       'jpg': 'image/jpeg',
       'jpeg': 'image/jpeg',

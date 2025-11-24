@@ -14,6 +14,7 @@ import { EnvironmentService } from '../shared/services/environment.service';
 export class BlogService {
 
   private readonly API_BASE_URL = `${environment.apiUrl}/blogs`;
+  private readonly CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
   private http = inject(HttpClient);
   private environmentService = inject(EnvironmentService);
@@ -23,9 +24,10 @@ export class BlogService {
   private errorSignal = signal<string | null>(null);
 
   private hasFetched = false;
+  private lastFetchedAt: number | null = null;
 
   fetchBlogs(options: { forceRefresh?: boolean } = {}): Observable<Blog[]> {
-    const shouldUseCache = !options.forceRefresh && this.hasFetched;
+    const shouldUseCache = !options.forceRefresh && this.hasFetched && this.isCacheFresh();
     if (shouldUseCache) {
       return of(this.blogsSignal());
     }
@@ -39,6 +41,7 @@ export class BlogService {
         this.blogsSignal.set(uniqueBlogs);
         this.errorSignal.set(null);
         this.hasFetched = true;
+        this.lastFetchedAt = Date.now();
         return uniqueBlogs;
       }),
       catchError(error => {
@@ -132,12 +135,26 @@ export class BlogService {
 
   addBlogToList(blog: Blog): void {
     const currentBlogs = this.blogsSignal();
-    const exists = currentBlogs.some(b => b.id === blog.id || b.slug === blog.slug);
-    if (!exists) {
-      if (currentBlogs.length < 5) {
-        this.blogsSignal.set([...currentBlogs, blog]);
-      }
+    const index = currentBlogs.findIndex(b => b.id === blog.id || b.slug === blog.slug);
+    if (index >= 0) {
+      const updatedBlogs = [...currentBlogs];
+      updatedBlogs[index] = { ...updatedBlogs[index], ...blog };
+      this.blogsSignal.set(updatedBlogs);
+      return;
     }
+    const updatedBlogs = [...currentBlogs, blog].sort((a, b) => {
+      const aTime = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
+      const bTime = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
+      return bTime - aTime;
+    });
+    this.blogsSignal.set(updatedBlogs);
+  }
+
+  private isCacheFresh(): boolean {
+    if (!this.lastFetchedAt) {
+      return false;
+    }
+    return Date.now() - this.lastFetchedAt < this.CACHE_TTL_MS;
   }
 
 }

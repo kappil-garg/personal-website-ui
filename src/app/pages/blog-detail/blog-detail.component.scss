@@ -164,6 +164,12 @@
         gap: var(--space-3);
         text-decoration: none;
         color: inherit;
+
+        &:focus-visible {
+          outline: 2px solid var(--color-primary);
+          outline-offset: 2px;
+          border-radius: var(--radius-base);
+        }
       }
 
       .author-avatar {
