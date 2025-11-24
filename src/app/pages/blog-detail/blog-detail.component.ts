@@ -1,9 +1,9 @@
-import { Component, OnInit, signal,  computed, ChangeDetectionStrategy, inject, OnDestroy, effect } from '@angular/core';
+import { Component, OnInit, signal,  computed, ChangeDetectionStrategy, inject, OnDestroy, effect, DestroyRef, SecurityContext } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { Subject, takeUntil } from 'rxjs';
-import DOMPurify from 'dompurify';
+import { Subject, finalize, takeUntil } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { BlogService } from '../../services/blog.service';
 import { CategoryConfigService } from '../../services/category-config.service';
 import { Blog } from '../../models/blog.interface';
@@ -30,11 +30,13 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
 
   private router = inject(Router);
   private route = inject(ActivatedRoute);
-  public blogService = inject(BlogService);
-  private categoryConfigService = inject(CategoryConfigService);
+  private destroyRef = inject(DestroyRef);
+  
   private seoService = inject(SeoService);
-  private portfolioService = inject(PortfolioService);
   private sanitizer = inject(DomSanitizer);
+  private blogService = inject(BlogService);
+  private portfolioService = inject(PortfolioService);
+  private categoryConfigService = inject(CategoryConfigService);
 
   private blogSlug = signal<string>('');
   private isLoadingBlogSignal = signal<boolean>(false);
@@ -52,28 +54,25 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
   });
 
   error = computed(() => this.blogService.error());
-  loading = computed(() => this.isLoadingBlogSignal() || this.blogService.loading());
   authorInfo = computed(() => this.portfolioService.personalInfo());
+  loading = computed(() => this.isLoadingBlogSignal() || this.blogService.loading());
 
   /**
-   * Sanitizes and returns blog content HTML for safe rendering.
-   * Uses DOMPurify to sanitize HTML before rendering to prevent XSS attacks.
+   * Sanitizes and returns blog content HTML for safe rendering using Angular's SecurityContext.
    */
   getSanitizedContent(): SafeHtml | null {
     const content = this.blog()?.content;
     if (!content) return null;
-    const sanitized = typeof window !== 'undefined' 
-      ? DOMPurify.sanitize(content) 
-      : content;
-    return this.sanitizer.bypassSecurityTrustHtml(sanitized);
+    const sanitized = this.sanitizer.sanitize(SecurityContext.HTML, content);
+    return sanitized ? this.sanitizer.bypassSecurityTrustHtml(sanitized) : null;
   }
 
   constructor() {
-    // Update SEO meta tags whenever blog changes
     effect(() => {
       const currentBlog = this.blog();
       if (currentBlog) {
         this.seoService.setBlogPostMetaTags(currentBlog);
+        this.scrollToTop();
       }
     });
   }
@@ -91,7 +90,6 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-    // Reset to default meta tags when leaving the page
     this.seoService.setDefaultMetaTags();
   }
 
@@ -99,28 +97,25 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
     const existingBlog = this.blog();
     if (existingBlog) {
       this.incrementViewCount(existingBlog.id);
-      // Set SEO meta tags for existing blog
-      this.seoService.setBlogPostMetaTags(existingBlog);
       return;
     }
     this.isLoadingBlogSignal.set(true);
     this.currentBlogSignal.set(null);
-    this.blogService.getBlogBySlug(slug).subscribe({
+    this.blogService.getBlogBySlug(slug).pipe(
+      takeUntilDestroyed(this.destroyRef),
+      finalize(() => this.isLoadingBlogSignal.set(false))
+    ).subscribe({
       next: (blog) => {
-        this.isLoadingBlogSignal.set(false);
         if (blog) {
           this.currentBlogSignal.set(blog);
           this.blogService.addBlogToList(blog);
           this.incrementViewCount(blog.id);
-          // Set SEO meta tags when blog is loaded
-          this.seoService.setBlogPostMetaTags(blog);
         } else {
           this.currentBlogSignal.set(null);
           this.router.navigate(['/blogs']);
         }
       },
       error: () => {
-        this.isLoadingBlogSignal.set(false);
         this.currentBlogSignal.set(null);
         this.router.navigate(['/blogs']);
       },
@@ -128,7 +123,16 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
   }
 
   private incrementViewCount(blogId: string): void {
-    this.blogService.incrementViewCount(blogId).subscribe();
+    this.blogService.incrementViewCount(blogId).pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe();
+  }
+
+  private scrollToTop(): void {
+    if (typeof window === 'undefined') {
+      return;
+    }
+    window.scrollTo({ top: 0, behavior: 'auto' });
   }
 
   formatDate(dateString: string): string {

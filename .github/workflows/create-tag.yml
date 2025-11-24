@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'personal-website-ui/package.json'
+      - 'package.json'
 
 jobs:
   auto-tag:
@@ -27,18 +27,18 @@ jobs:
       - name: Get current version
         id: version
         run: |
-          VERSION_TO_TAG=$(node -p "require('./personal-website-ui/package.json').version")
+          VERSION_TO_TAG=$(node -p "require('./package.json').version")
           echo "version_to_tag=$VERSION_TO_TAG" >> $GITHUB_OUTPUT
-          echo "Using personal-website-ui/package.json version: $VERSION_TO_TAG"
+          echo "Using package.json version: $VERSION_TO_TAG"
 
       - name: Check if version was updated
         id: version-check
         run: |
           # Get the previous version from git history
-          PREVIOUS_VERSION=$(git show HEAD~1:personal-website-ui/package.json 2>/dev/null | grep '"version"' | sed 's/.*"version": "\([^"]*\)".*/\1/' || echo "0.0.0")
+          PREVIOUS_VERSION=$(git show HEAD~1:package.json 2>/dev/null | grep '"version"' | sed 's/.*"version": "\([^"]*\)".*/\1/' || echo "0.0.0")
           
           # Get current version
-          CURRENT_VERSION=$(node -p "require('./personal-website-ui/package.json').version")
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
           
           echo "Previous version: $PREVIOUS_VERSION"
           echo "Current version: $CURRENT_VERSION"
