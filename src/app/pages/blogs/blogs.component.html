@@ -188,37 +188,42 @@
                   <!-- Excerpt -->
                   <p class="blog-excerpt">{{ blog.excerpt }}</p>
 
-                  <!-- Meta Information -->
-                  <div class="blog-meta">
-                    <div class="meta-item">
-                      <i class="fas fa-calendar-alt meta-icon"></i>
-                      <span class="meta-text">{{
-                        blog.publishedAt
-                          ? formatDate(blog.publishedAt)
-                          : "Not published"
-                      }}</span>
+                  <!-- Card Footer (Meta + Actions) - Always aligned at bottom -->
+                  <div class="blog-card-footer">
+                    <!-- Meta Information -->
+                    <div class="blog-meta">
+                      <div class="meta-item">
+                        <i class="fas fa-calendar-alt meta-icon"></i>
+                        <span class="meta-text">{{
+                          blog.publishedAt
+                            ? formatDate(blog.publishedAt)
+                            : "Not published"
+                        }}</span>
+                      </div>
+                      <div class="meta-item">
+                        <i class="fas fa-clock meta-icon"></i>
+                        <span class="meta-text"
+                          >{{ blog.readingTime }} min read</span
+                        >
+                      </div>
+                      <div class="meta-item">
+                        <i class="fas fa-eye meta-icon"></i>
+                        <span class="meta-text"
+                          >{{ blog.viewCount }} views</span
+                        >
+                      </div>
                     </div>
-                    <div class="meta-item">
-                      <i class="fas fa-clock meta-icon"></i>
-                      <span class="meta-text"
-                        >{{ blog.readingTime }} min read</span
-                      >
-                    </div>
-                    <div class="meta-item">
-                      <i class="fas fa-eye meta-icon"></i>
-                      <span class="meta-text">{{ blog.viewCount }} views</span>
-                    </div>
-                  </div>
 
-                  <!-- Read More Button -->
-                  <div class="blog-actions">
-                    <a
-                      [routerLink]="['/blogs', blog.slug]"
-                      class="read-more-btn"
-                    >
-                      Read More
-                      <i class="fas fa-arrow-right btn-icon"></i>
-                    </a>
+                    <!-- Read More Button -->
+                    <div class="blog-actions">
+                      <a
+                        [routerLink]="['/blogs', blog.slug]"
+                        class="read-more-btn"
+                      >
+                        Read More
+                        <i class="fas fa-arrow-right btn-icon"></i>
+                      </a>
+                    </div>
                   </div>
                 </div>
               </article>
