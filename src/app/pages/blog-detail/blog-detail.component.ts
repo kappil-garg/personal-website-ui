@@ -64,7 +64,10 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
       const blog = data['blog'] as Blog | null;
       if (blog) {
         this.currentBlogSignal.set(blog);
-        this.incrementViewCount(blog.id);
+        // Only increment view count on client-side to avoid double counting during SSR
+        if (isPlatformBrowser(this.platformId)) {
+          this.incrementViewCount(blog.id);
+        }
         this.scrollToTop();
       } else {
         // Blog not found, redirect to blogs list
@@ -82,7 +85,11 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
   private incrementViewCount(blogId: string): void {
     this.blogService.incrementViewCount(blogId).pipe(
       takeUntilDestroyed(this.destroyRef)
-    ).subscribe();
+    ).subscribe((updatedBlog) => {
+      if (updatedBlog) {
+        this.currentBlogSignal.set(updatedBlog);
+      }
+    });
   }
 
   private scrollToTop(): void {

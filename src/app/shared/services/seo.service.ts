@@ -14,7 +14,7 @@ export class SeoService {
 
   private readonly author = 'Kapil Garg';
   private readonly baseUrl = 'https://www.kappilgarg.dev';
-  private readonly defaultImage = 'https://kappilgarg.dev/assets/images/profile-pic.png';
+  private readonly defaultImage = 'https://www.kappilgarg.dev/assets/images/profile-pic.png';
   private readonly defaultTitle = 'Kapil Garg - Java Full Stack Developer & Tech Explorer';
   private readonly defaultDescription = 'Full Stack Java Developer with 8+ years of experience in enterprise-grade software solutions. Specialized in Spring Boot, Angular, and modern web technologies.';
 

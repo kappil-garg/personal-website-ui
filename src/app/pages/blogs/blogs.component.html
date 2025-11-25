@@ -113,24 +113,25 @@
           <app-loading-spinner message="Loading blogs..." />
         }
 
-        <!-- Error State -->
-        @if (error()) {
-          <app-error-state
-            [message]="error() || 'An error occurred'"
-            (retry)="retryFetchBlogs()"
-          />
-        }
-
-        <!-- Empty State -->
-        @if (!loading() && !error() && filteredBlogs().length === 0) {
+        <!-- Empty/Error State -->
+        @if (!loading() && filteredBlogs().length === 0) {
           <div class="empty-state">
             <div class="empty-icon">
               <i class="fas fa-file-alt"></i>
             </div>
-            @if (blogService.blogs().length === 0) {
+            @if (error() && blogService.blogs().length === 0) {
+              <!-- API Error: Can't load blogs -->
+              <h3>Unable to load blogs</h3>
+              <p>We're having trouble connecting. Please try again.</p>
+              <button class="clear-filters-btn" (click)="retryFetchBlogs()">
+                Try Again
+              </button>
+            } @else if (blogService.blogs().length === 0) {
+              <!-- No blogs exist -->
               <h3>No blogs yet</h3>
               <p>Check back soon for new blog posts!</p>
             } @else {
+              <!-- Filters applied, no matches -->
               <h3>No blogs found</h3>
               <p>
                 No blogs match your current filters. Try adjusting your search
