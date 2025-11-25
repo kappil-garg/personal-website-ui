@@ -71,12 +71,28 @@ export class BlogService {
 
   incrementViewCount(blogId: string): Observable<Blog | null> {
     return this.http.post<ApiResponse<Blog>>(`${this.API_BASE_URL}/${blogId}/view`, {}).pipe(
-      map(response => response.data),
+      map(response => {
+        const updatedBlog = response.data;
+        if (updatedBlog) {
+          this.updateBlogInList(updatedBlog);
+        }
+        return updatedBlog;
+      }),
       catchError(error => {
         this.environmentService.warn('Error incrementing view count:', error);
         return of(null);
       })
     );
+  }
+
+  private updateBlogInList(updatedBlog: Blog): void {
+    const currentBlogs = this.blogsSignal();
+    const index = currentBlogs.findIndex(b => b.id === updatedBlog.id || b.slug === updatedBlog.slug);
+    if (index >= 0) {
+      const updatedBlogs = [...currentBlogs];
+      updatedBlogs[index] = { ...updatedBlogs[index], ...updatedBlog };
+      this.blogsSignal.set(updatedBlogs);
+    }
   }
 
   filterBlogs(blogs: Blog[], filters: BlogFilters): Blog[] {

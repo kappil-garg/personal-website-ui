@@ -9,7 +9,6 @@ import { BlogCategory, BlogFilters } from '../../models/blog.interface';
 import { APP_CONSTANTS, SortOption, SortOrder } from '../../shared/constants/app.constants';
 import { DateUtils } from '../../shared/utils/date.utils';
 import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner/loading-spinner.component';
-import { ErrorStateComponent } from '../../shared/components/error-state/error-state.component';
 import { EnvironmentService } from '../../shared/services/environment.service';
 import { SeoService } from '../../shared/services/seo.service';
 
@@ -20,7 +19,6 @@ import { SeoService } from '../../shared/services/seo.service';
     CommonModule,
     RouterModule,
     LoadingSpinnerComponent,
-    ErrorStateComponent,
   ],
   templateUrl: './blogs.component.html',
   styleUrl: './blogs.component.scss',

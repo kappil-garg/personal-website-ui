@@ -471,6 +471,14 @@
     line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    flex: 1;
+  }
+
+  // Footer section that's always aligned at the bottom of each card
+  .blog-card-footer {
+    margin-top: auto;
+    border-top: 1px solid var(--color-border);
+    padding-top: var(--space-4);
   }
 
   .blog-meta {
@@ -488,14 +496,17 @@
 
       .meta-icon {
         font-size: var(--font-size-base);
+        width: 16px;
+        text-align: center;
+      }
+
+      .meta-text {
+        white-space: nowrap;
       }
     }
   }
 
   .blog-actions {
-    margin-top: auto;
-    padding-top: var(--space-4);
-
     .read-more-btn {
       display: inline-flex;
       align-items: center;
