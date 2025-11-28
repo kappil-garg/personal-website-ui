@@ -14,7 +14,7 @@
   ],
   "functions": {
     "api/serverless.mjs": {
-      "includeFiles": "dist/personal-website-ui/**"
+      "includeFiles": "dist/personal-website-ui/**/*"
     }
   },
   "headers": [
