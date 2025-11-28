@@ -94,7 +94,11 @@ export class BlogsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.seoService.setBlogsListingMetaTags();
-    this.loadBlogs();
+    if (this.blogService.blogs().length === 0 && !this.blogService.loading()) {
+      this.loadBlogs();
+    } else {
+      this.cdr.markForCheck();
+    }
     this.searchSubject
       .pipe(
         debounceTime(APP_CONSTANTS.UI.DEBOUNCE_TIME),

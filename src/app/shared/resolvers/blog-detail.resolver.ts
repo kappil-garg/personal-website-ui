@@ -6,7 +6,7 @@ import { Blog } from '../../models/blog.interface';
 import { BlogService } from '../../services/blog.service';
 import { SeoService } from '../services/seo.service';
 
-export const blogResolver: ResolveFn<Blog | null> = (route) => {
+export const blogDetailResolver: ResolveFn<Blog | null> = (route) => {
 
   const slug = route.paramMap.get('slug');
   if (!slug) {

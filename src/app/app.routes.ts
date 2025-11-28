@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
-import { blogResolver } from './shared/resolvers/blog.resolver';
+import { blogDetailResolver } from './shared/resolvers/blog-detail.resolver';
+import { blogsListResolver } from './shared/resolvers/blogs-list.resolver';
 
 export const routes: Routes = [
   { 
@@ -45,13 +46,14 @@ export const routes: Routes = [
   {
     path: 'blogs',
     loadComponent: () => import('./pages/blogs/blogs.component').then(m => m.BlogsComponent),
-    title: 'Blogs - Kapil Garg'
+    title: 'Blogs - Kapil Garg',
+    resolve: { blogs: blogsListResolver }
   },
   {
     path: 'blogs/:slug',
     loadComponent: () => import('./pages/blog-detail/blog-detail.component').then(m => m.BlogDetailComponent),
     title: 'Blog Post - Kapil Garg',
-    resolve: { blog: blogResolver }
+    resolve: { blog: blogDetailResolver }
   },
   {
     path: 'contact',

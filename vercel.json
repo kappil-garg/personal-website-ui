@@ -8,7 +8,7 @@
       "destination": "https://api.kappilgarg.dev/api/$1"
     },
     {
-      "source": "/(.*)",
+      "source": "/((?!api).*)",
       "destination": "/api/serverless"
     }
   ],
