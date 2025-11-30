@@ -12,5 +12,5 @@ export const blogsListResolver: ResolveFn<Blog[]> = () => {
   if (blogService.hasFullListLoaded) {
     return of(blogService.blogs());
   }
-  return of([]);
+  return blogService.fetchBlogs();;
 };
