@@ -149,6 +149,10 @@ export class BlogService {
     return this.errorSignal.asReadonly();
   }
 
+  get hasFullListLoaded(): boolean {
+    return this.hasFetched;
+  }
+
   addBlogToList(blog: Blog): void {
     const currentBlogs = this.blogsSignal();
     const index = currentBlogs.findIndex(b => b.id === blog.id || b.slug === blog.slug);

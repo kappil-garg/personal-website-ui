@@ -12,6 +12,7 @@ import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner
 import { ErrorStateComponent } from '../../shared/components/error-state/error-state.component';
 import { SeoService } from '../../shared/services/seo.service';
 import { PortfolioService } from '../../services/portfolio.service';
+import { BlogDetailResult } from '../../models/blog.interface';
 
 @Component({
   selector: 'app-blog-detail',
@@ -31,7 +32,7 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private destroyRef = inject(DestroyRef);
-  
+
   private seoService = inject(SeoService);
   private platformId = inject(PLATFORM_ID);
   private sanitizer = inject(DomSanitizer);
@@ -39,15 +40,27 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
   private portfolioService = inject(PortfolioService);
   private categoryConfigService = inject(CategoryConfigService);
 
+  private apiErrorSignal = signal<boolean>(false);
   private currentBlogSignal = signal<Blog | null>(null);
 
   private destroy$ = new Subject<void>();
 
   blog = computed(() => this.currentBlogSignal());
-
-  error = computed(() => this.blogService.error());
+  hasApiError = computed(() => this.apiErrorSignal());
   authorInfo = computed(() => this.portfolioService.personalInfo());
-  loading = computed(() => !this.currentBlogSignal() && this.blogService.loading());
+
+  loading = computed(
+    () =>
+      !this.currentBlogSignal() &&
+      !this.apiErrorSignal() &&
+      this.blogService.loading(),
+  );
+  
+  error = computed(() =>
+    this.apiErrorSignal()
+      ? 'Failed to load blog. Please try again.'
+      : this.blogService.error(),
+  );
 
   /**
    * Sanitizes and returns blog content HTML for safe rendering using Angular's SecurityContext.
@@ -61,16 +74,21 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.route.data.pipe(takeUntil(this.destroy$)).subscribe((data) => {
-      const blog = data['blog'] as Blog | null;
-      if (blog) {
-        this.currentBlogSignal.set(blog);
-        // Only increment view count on client-side to avoid double counting during SSR
+      const result = data['blog'] as BlogDetailResult;
+      if (result?.blog) {
+        this.currentBlogSignal.set(result.blog);
+        this.apiErrorSignal.set(false);
         if (isPlatformBrowser(this.platformId)) {
-          this.incrementViewCount(blog.id);
+          this.incrementViewCount(result.blog.id);
         }
         this.scrollToTop();
+      } else if (result?.error === 'not_found') {
+        this.router.navigate(['/blogs']);
+      } else if (result?.error === 'api_error') {
+        this.apiErrorSignal.set(true);
+        this.currentBlogSignal.set(null);
+        this.scrollToTop();
       } else {
-        // Blog not found, redirect to blogs list
         this.router.navigate(['/blogs']);
       }
     });
@@ -83,13 +101,14 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
   }
 
   private incrementViewCount(blogId: string): void {
-    this.blogService.incrementViewCount(blogId).pipe(
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe((updatedBlog) => {
-      if (updatedBlog) {
-        this.currentBlogSignal.set(updatedBlog);
-      }
-    });
+    this.blogService
+      .incrementViewCount(blogId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((updatedBlog) => {
+        if (updatedBlog) {
+          this.currentBlogSignal.set(updatedBlog);
+        }
+      });
   }
 
   private scrollToTop(): void {
@@ -115,25 +134,58 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
     this.router.navigate(['/blogs']);
   }
 
+  retryLoadBlog(): void {
+    const slug = this.route.snapshot.paramMap.get('slug');
+    if (!slug) {
+      this.router.navigate(['/blogs']);
+      return;
+    }
+    this.apiErrorSignal.set(false);
+    this.blogService
+      .getBlogBySlug(slug)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (blog) => {
+          if (blog) {
+            this.currentBlogSignal.set(blog);
+            this.apiErrorSignal.set(false);
+            this.blogService.addBlogToList(blog);
+            this.seoService.setBlogPostMetaTags(blog);
+            if (isPlatformBrowser(this.platformId)) {
+              this.incrementViewCount(blog.id);
+            }
+          } else {
+            this.router.navigate(['/blogs']);
+          }
+        },
+        error: () => {
+          this.apiErrorSignal.set(true);
+        },
+      });
+  }
+
   shareBlog(): void {
     if (!isPlatformBrowser(this.platformId)) return;
     const blog = this.blog();
     if (!blog) return;
     if (window.navigator?.share) {
-      window.navigator.share({
-        title: blog.title,
-        text: blog.excerpt,
-        url: window.location.href,
-      }).catch(() => {
-        this.copyToClipboard();
-      });
+      window.navigator
+        .share({
+          title: blog.title,
+          text: blog.excerpt,
+          url: window.location.href,
+        })
+        .catch(() => {
+          this.copyToClipboard();
+        });
     } else {
       this.copyToClipboard();
     }
   }
 
   private copyToClipboard(): void {
-    if (!isPlatformBrowser(this.platformId) || !window.navigator?.clipboard) return;
+    if (!isPlatformBrowser(this.platformId) || !window.navigator?.clipboard)
+      return;
     window.navigator.clipboard.writeText(window.location.href).catch(() => {});
   }
 
