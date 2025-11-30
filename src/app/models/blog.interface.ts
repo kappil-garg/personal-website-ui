@@ -33,3 +33,8 @@ export interface BlogFilters {
   sortBy?: 'publishedAt' | 'viewCount' | 'readingTime';
   sortOrder?: 'asc' | 'desc';
 }
+
+export interface BlogDetailResult {
+  blog: Blog | null;
+  error: 'not_found' | 'api_error' | null;
+}

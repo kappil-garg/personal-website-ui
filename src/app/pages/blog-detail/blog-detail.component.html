@@ -6,11 +6,19 @@
 
   <!-- Error State -->
   @if (error()) {
-    <app-error-state
-      [message]="error() || 'An error occurred'"
-      retryText="Back to Blogs"
-      (retry)="goBack()"
-    />
+    <div class="error-state-wrapper">
+      <app-error-state
+        [message]="error() || 'An error occurred'"
+        [retryText]="hasApiError() ? 'Try Again' : 'Back to Blogs'"
+        (retry)="hasApiError() ? retryLoadBlog() : goBack()"
+      />
+      @if (hasApiError()) {
+        <button class="back-btn secondary-action" (click)="goBack()">
+          <i class="fas fa-arrow-left"></i>
+          Back to Blogs
+        </button>
+      }
+    </div>
   }
 
   <!-- Blog Content -->
