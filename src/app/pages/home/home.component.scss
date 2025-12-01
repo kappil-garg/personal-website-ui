@@ -17,6 +17,7 @@
 
 .hero-image {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   position: relative;
@@ -63,6 +64,105 @@
     rgba(var(--color-primary-rgb), 0.1) 100%
   );
   z-index: 1;
+}
+
+.social-links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: var(--space-16);
+  flex-wrap: wrap;
+}
+
+.social-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(var(--color-primary-rgb), 0.08);
+  color: var(--color-text);
+  text-decoration: none;
+  transition: all var(--duration-normal) var(--ease-standard);
+  border: 2px solid transparent;
+  position: relative;
+  overflow: hidden;
+
+  i {
+    font-size: 1.25rem;
+    transition: transform var(--duration-fast) var(--ease-standard);
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(var(--color-primary-rgb), 0.15);
+    transform: translate(-50%, -50%);
+    transition:
+      width var(--duration-normal) var(--ease-standard),
+      height var(--duration-normal) var(--ease-standard);
+  }
+
+  &:hover {
+    transform: translateY(-3px);
+    border-color: var(--color-primary);
+    background: rgba(var(--color-primary-rgb), 0.12);
+    box-shadow: 0 8px 20px rgba(var(--color-primary-rgb), 0.2);
+
+    &::before {
+      width: 100%;
+      height: 100%;
+    }
+
+    i {
+      transform: scale(1.15);
+      color: var(--color-primary);
+    }
+  }
+
+  &:active {
+    transform: translateY(-1px);
+  }
+
+  // Platform-specific colors on hover
+  &.social-link-linkedin:hover {
+    border-color: #0077b5;
+    background: rgba(0, 119, 181, 0.1);
+    i {
+      color: #0077b5;
+    }
+  }
+
+  &.social-link-github:hover {
+    border-color: #333;
+    background: rgba(51, 51, 51, 0.1);
+    i {
+      color: #333;
+    }
+  }
+
+  &.social-link-twitter:hover {
+    border-color: #1da1f2;
+    background: rgba(29, 161, 242, 0.1);
+    i {
+      color: #1da1f2;
+    }
+  }
+
+  &.social-link-website:hover {
+    border-color: var(--color-primary);
+    background: rgba(var(--color-primary-rgb), 0.12);
+    i {
+      color: var(--color-primary);
+    }
+  }
 }
 
 .profile-pic:hover {
@@ -160,9 +260,13 @@
   color: var(--color-text);
   opacity: 0.9;
   font-weight: 400;
+  text-align: justify;
+  text-justify: inter-word;
 
   p {
     margin-bottom: var(--space-4);
+    text-align: justify;
+    text-justify: inter-word;
 
     &:last-child {
       margin-bottom: 0;
@@ -314,6 +418,20 @@
   .profile-pic {
     width: clamp(150px, 40vw, 200px);
     height: clamp(150px, 40vw, 200px);
+  }
+
+  .social-links {
+    margin-top: var(--space-4);
+    gap: var(--space-3);
+  }
+
+  .social-link {
+    width: 40px;
+    height: 40px;
+
+    i {
+      font-size: 1.1rem;
+    }
   }
 }
 

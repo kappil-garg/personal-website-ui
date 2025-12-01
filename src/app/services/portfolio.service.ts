@@ -1,44 +1,119 @@
-import { Injectable, signal } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Injectable, signal, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, of, catchError, finalize, map } from 'rxjs';
 import { PersonalInfo } from '../models/portfolio.interface';
+import { ApiResponse } from '../models/api-response.interface';
+import { environment } from '../../environments/environment';
+import { EnvironmentService } from '../shared/services/environment.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PortfolioService {
   
-  // Centralized data management with signals for reactivity
-  private personalInfoSignal = signal<PersonalInfo | null>(null);
+  private readonly CACHE_TTL_MS = 10 * 60 * 1000;
+  private readonly API_BASE_URL = `${environment.apiUrl}/portfolio`;
+
+  private http = inject(HttpClient);
+  private environmentService = inject(EnvironmentService);
   
+  // Centralized data management with signals for reactivity
+  private loadingSignal = signal<boolean>(false);
+  private errorSignal = signal<string | null>(null);
+  private personalInfoSignal = signal<PersonalInfo | null>(null);
+
+  private hasFetched = false;
+  private lastFetchedAt: number | null = null;
+
   constructor() {
     this.loadPersonalInfo();
   }
 
-  private loadPersonalInfo(): void {
-    const personalInfo: PersonalInfo = {
+  loadPersonalInfo(options: { forceRefresh?: boolean } = {}): Observable<PersonalInfo | null> {
+    const shouldUseCache = !options.forceRefresh && this.hasFetched && this.isCacheFresh();
+    if (shouldUseCache && this.personalInfoSignal()) {
+      return of(this.personalInfoSignal()!);
+    }
+    
+    this.loadingSignal.set(true);
+    return this.http.get<ApiResponse<PersonalInfo>>(this.API_BASE_URL).pipe(
+      map(response => {
+        const personalInfo = response.data;
+        if (personalInfo) {
+          this.personalInfoSignal.set(personalInfo);
+          this.errorSignal.set(null);
+          this.hasFetched = true;
+          this.lastFetchedAt = Date.now();
+          return personalInfo;
+        }
+        return null;
+      }),
+      catchError(error => {
+        this.environmentService.warn('Error fetching personal info:', error);
+        if (!this.personalInfoSignal()) {
+          this.loadFallbackData();
+          this.errorSignal.set('Failed to load personal info. Using cached data.');
+        } else {
+          this.errorSignal.set(null);
+        }
+        return of(this.personalInfoSignal());
+      }),
+      finalize(() => {
+        this.loadingSignal.set(false);
+      })
+    );
+  }
+
+  private loadFallbackData(): void {
+    const fallbackInfo: PersonalInfo = {
       name: 'Kapil Garg',
-      tagline: 'Obsessed with details. Driven by clean design.',
+      tagline: 'Full Stack Developer',
       description: [
-        "I'm a Java Full Stack Developer with 8+ years of experience crafting robust and scalable enterprise-grade applications across diverse domains like Finance, Insurance, and Healthcare.",
-        "My expertise spans the entire development lifecycle, from designing microservices architectures to building responsive Angular frontends. I'm passionate about clean code, performance optimization, and creating solutions that stand the test of time.",
-        "When I'm not coding, I enjoy sharing knowledge through technical writing, exploring new technologies, binge-watching TV shows, or cheering for my favorite football team.",
+        'Java Full Stack Developer with experience in enterprise applications.',
       ],
       profileImage: 'assets/images/profile-pic.png',
-      email: 'kappilgarg519@gmail.com',
-      location: 'Noida, IN',
     };
-    
-    this.personalInfoSignal.set(personalInfo);
+    this.personalInfoSignal.set(fallbackInfo);
   }
 
   getPersonalInfo(): Observable<PersonalInfo> {
     const info = this.personalInfoSignal();
-    return info ? of(info) : of({} as PersonalInfo);
+    if (info) {
+      return of(info);
+    }
+    return this.loadPersonalInfo().pipe(
+      map(info => {
+        if (!info) {
+          this.loadFallbackData();
+          return this.personalInfoSignal()!;
+        }
+        return info;
+      })
+    );
   }
   
   // Signal-based getter for reactive components
   get personalInfo() {
     return this.personalInfoSignal.asReadonly();
+  }
+
+  get loading() {
+    return this.loadingSignal.asReadonly();
+  }
+
+  get error() {
+    return this.errorSignal.asReadonly();
+  }
+
+  get hasDataLoaded(): boolean {
+    return this.hasFetched;
+  }
+
+  private isCacheFresh(): boolean {
+    if (!this.lastFetchedAt) {
+      return false;
+    }
+    return Date.now() - this.lastFetchedAt < this.CACHE_TTL_MS;
   }
   
 }

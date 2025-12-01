@@ -1,38 +1,35 @@
-import { Component, signal, inject, OnInit } from '@angular/core';
+import { Component, computed, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { PortfolioService } from '../../services/portfolio.service';
-import { PersonalInfo } from '../../models/portfolio.interface';
-import { EnvironmentService } from '../../shared/services/environment.service';
+import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner/loading-spinner.component';
+import { ErrorStateComponent } from '../../shared/components/error-state/error-state.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule],
+  imports: [
+    CommonModule,
+    LoadingSpinnerComponent,
+    ErrorStateComponent,
+  ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent implements OnInit {
 
   private router = inject(Router);
-  private portfolioService = inject(PortfolioService);
-  private environmentService = inject(EnvironmentService);
+  public portfolioService = inject(PortfolioService);
 
-  personalInfo = signal<PersonalInfo | null>(null);
+  error = computed(() => this.portfolioService.error());
+  loading = computed(() => this.portfolioService.loading());
+  personalInfo = computed(() => this.portfolioService.personalInfo());
 
   ngOnInit(): void {
-    this.loadPersonalInfo();
-  }
-
-  loadPersonalInfo(): void {
-    this.portfolioService.getPersonalInfo().subscribe({
-      next: (data: PersonalInfo) => {
-        this.personalInfo.set(data);
-      },
-      error: (err) => {
-        this.environmentService.warn('Failed to load personal info:', err);
-      },
-    });
+    if (!this.portfolioService.hasDataLoaded) {
+      this.portfolioService.loadPersonalInfo().subscribe();
+    }
   }
 
   navigateToProjects(): void {
@@ -41,6 +38,10 @@ export class HomeComponent implements OnInit {
 
   navigateToContact(): void {
     this.router.navigate(['/contact']);
+  }
+
+  retryLoadPersonalInfo(): void {
+    this.portfolioService.loadPersonalInfo({ forceRefresh: true }).subscribe();
   }
   
 }
