@@ -148,6 +148,18 @@
     }
   }
 
+  // Dark mode support for GitHub hover
+  :host-context([data-color-scheme="dark"]) &,
+  [data-color-scheme="dark"] & {
+    &.social-link-github:hover {
+      border-color: #f5f5f5;
+      background: rgba(245, 245, 245, 0.16);
+      i {
+        color: #f5f5f5;
+      }
+    }
+  }
+
   &.social-link-twitter:hover {
     border-color: #1da1f2;
     background: rgba(29, 161, 242, 0.1);
@@ -261,12 +273,10 @@
   opacity: 0.9;
   font-weight: 400;
   text-align: justify;
-  text-justify: inter-word;
 
   p {
     margin-bottom: var(--space-4);
     text-align: justify;
-    text-justify: inter-word;
 
     &:last-child {
       margin-bottom: 0;

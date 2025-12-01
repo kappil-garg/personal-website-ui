@@ -1,6 +1,6 @@
 import { Injectable, signal, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of, catchError, finalize, map } from 'rxjs';
+import { Observable, of, catchError, finalize, map, timeout, TimeoutError } from 'rxjs';
 import { PersonalInfo } from '../models/portfolio.interface';
 import { ApiResponse } from '../models/api-response.interface';
 import { environment } from '../../environments/environment';
@@ -12,6 +12,7 @@ import { EnvironmentService } from '../shared/services/environment.service';
 export class PortfolioService {
   
   private readonly CACHE_TTL_MS = 10 * 60 * 1000;
+  private readonly REQUEST_TIMEOUT_MS = 15 * 1000;
   private readonly API_BASE_URL = `${environment.apiUrl}/portfolio`;
 
   private http = inject(HttpClient);
@@ -25,10 +26,6 @@ export class PortfolioService {
   private hasFetched = false;
   private lastFetchedAt: number | null = null;
 
-  constructor() {
-    this.loadPersonalInfo();
-  }
-
   loadPersonalInfo(options: { forceRefresh?: boolean } = {}): Observable<PersonalInfo | null> {
     const shouldUseCache = !options.forceRefresh && this.hasFetched && this.isCacheFresh();
     if (shouldUseCache && this.personalInfoSignal()) {
@@ -37,6 +34,7 @@ export class PortfolioService {
     
     this.loadingSignal.set(true);
     return this.http.get<ApiResponse<PersonalInfo>>(this.API_BASE_URL).pipe(
+      timeout(this.REQUEST_TIMEOUT_MS),
       map(response => {
         const personalInfo = response.data;
         if (personalInfo) {
@@ -49,12 +47,22 @@ export class PortfolioService {
         return null;
       }),
       catchError(error => {
-        this.environmentService.warn('Error fetching personal info:', error);
-        if (!this.personalInfoSignal()) {
-          this.loadFallbackData();
-          this.errorSignal.set('Failed to load personal info. Using cached data.');
+        if (error instanceof TimeoutError) {
+          this.environmentService.warn('Personal info request timed out after', this.REQUEST_TIMEOUT_MS, 'ms');
+          if (!this.personalInfoSignal()) {
+            this.loadFallbackData();
+            this.errorSignal.set('Request timed out. Please check your connection and try again. Using fallback data.');
+          } else {
+            this.errorSignal.set(null);
+          }
         } else {
-          this.errorSignal.set(null);
+          this.environmentService.warn('Error fetching personal info:', error);
+          if (!this.personalInfoSignal()) {
+            this.loadFallbackData();
+            this.errorSignal.set('Failed to load personal info. Using fallback data.');
+          } else {
+            this.errorSignal.set(null);
+          }
         }
         return of(this.personalInfoSignal());
       }),
