@@ -94,8 +94,10 @@ export class BlogsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.seoService.setBlogsListingMetaTags();
-    if (!this.blogService.hasFullListLoaded && !this.blogService.loading()) {
-      this.loadBlogs();
+    const needsLoading = !this.blogService.hasFullListLoaded && !this.blogService.loading();
+    const needsRefresh = this.blogService.hasFullListLoaded && !this.blogService.isCacheFresh() && !this.blogService.loading();
+    if (needsLoading || needsRefresh) {
+      this.loadBlogs(needsRefresh);
     } else {
       this.cdr.markForCheck();
     }
@@ -115,8 +117,8 @@ export class BlogsComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  private loadBlogs(): void {
-    this.blogService.fetchBlogs().pipe(
+  private loadBlogs(forceRefresh: boolean = false): void {
+    this.blogService.fetchBlogs({ forceRefresh }).pipe(
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: () => {

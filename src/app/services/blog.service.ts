@@ -187,7 +187,7 @@ export class BlogService {
     this.blogsSignal.set(updatedBlogs);
   }
 
-  private isCacheFresh(): boolean {
+  isCacheFresh(): boolean {
     if (!this.lastFetchedAt) {
       return false;
     }
