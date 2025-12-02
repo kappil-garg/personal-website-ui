@@ -1,6 +1,6 @@
 import { Injectable, signal, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of, catchError, finalize, map } from 'rxjs';
+import { Observable, of, catchError, finalize, map, timeout, TimeoutError } from 'rxjs';
 import { Blog, BlogFilters } from '../models/blog.interface';
 import { ApiResponse } from '../models/api-response.interface';
 import { APP_CONSTANTS, SortOption, SortOrder } from '../shared/constants/app.constants';
@@ -14,7 +14,9 @@ import { EnvironmentService } from '../shared/services/environment.service';
 export class BlogService {
 
   private readonly API_BASE_URL = `${environment.apiUrl}/blogs`;
+
   private readonly CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+  private readonly REQUEST_TIMEOUT_MS = 15 * 1000; // 15 seconds timeout
 
   private http = inject(HttpClient);
   private environmentService = inject(EnvironmentService);
@@ -33,6 +35,7 @@ export class BlogService {
     }
     this.loadingSignal.set(true);
     return this.http.get<ApiResponse<Blog[]>>(`${this.API_BASE_URL}/published`).pipe(
+      timeout(this.REQUEST_TIMEOUT_MS),
       map(response => {
         const blogs = response.data || [];
         const uniqueBlogs = blogs.filter((blog, index, self) => 
@@ -45,11 +48,20 @@ export class BlogService {
         return uniqueBlogs;
       }),
       catchError(error => {
-        this.environmentService.warn('Error fetching blogs:', error);
-        if (this.blogsSignal().length === 0) {
-          this.errorSignal.set('Failed to load blogs. Please try again later.');
+        if (error instanceof TimeoutError) {
+          this.environmentService.warn('Blogs request timed out after', this.REQUEST_TIMEOUT_MS, 'ms');
+          if (this.blogsSignal().length === 0) {
+            this.errorSignal.set('Request timed out. Please check your connection and try again.');
+          } else {
+            this.errorSignal.set(null);
+          }
         } else {
-          this.errorSignal.set(null);
+          this.environmentService.warn('Error fetching blogs:', error);
+          if (this.blogsSignal().length === 0) {
+            this.errorSignal.set('Failed to load blogs. Please try again later.');
+          } else {
+            this.errorSignal.set(null);
+          }
         }
         return of(this.blogsSignal());
       }),
@@ -61,9 +73,14 @@ export class BlogService {
 
   getBlogBySlug(slug: string): Observable<Blog | null> {
     return this.http.get<ApiResponse<Blog>>(`${this.API_BASE_URL}/published/${slug}`).pipe(
+      timeout(this.REQUEST_TIMEOUT_MS),
       map(response => response.data),
       catchError(error => {
-        this.environmentService.warn('Error fetching blog:', error);
+        if (error instanceof TimeoutError) {
+          this.environmentService.warn('Blog detail request timed out after', this.REQUEST_TIMEOUT_MS, 'ms');
+        } else {
+          this.environmentService.warn('Error fetching blog:', error);
+        }
         return of(null);
       })
     );
@@ -170,7 +187,7 @@ export class BlogService {
     this.blogsSignal.set(updatedBlogs);
   }
 
-  private isCacheFresh(): boolean {
+  isCacheFresh(): boolean {
     if (!this.lastFetchedAt) {
       return false;
     }
