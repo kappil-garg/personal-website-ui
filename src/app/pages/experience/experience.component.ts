@@ -5,6 +5,7 @@ import { ExperienceService } from '../../services/experience.service';
 import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner/loading-spinner.component';
 import { ErrorStateComponent } from '../../shared/components/error-state/error-state.component';
 import { SeoService } from '../../shared/services/seo.service';
+import { EnvironmentService } from '../../shared/services/environment.service';
 
 @Component({
   selector: 'app-experience',
@@ -23,6 +24,7 @@ export class ExperienceComponent implements OnInit {
   private destroyRef = inject(DestroyRef);
   private cdr = inject(ChangeDetectorRef);
   private seoService = inject(SeoService);
+  private environmentService = inject(EnvironmentService);
   public experienceService = inject(ExperienceService);
 
   experiences = computed(() => this.experienceService.experiences());
@@ -46,25 +48,21 @@ export class ExperienceComponent implements OnInit {
         this.cdr.markForCheck();
       },
       error: (error) => {
-        console.error('Failed to load experiences:', error);
+        this.environmentService.warn('Failed to load experiences:', error);
         this.cdr.markForCheck();
       }
     });
   }
 
-  formatDate(dateString: string): string {
-    if (!dateString) {
-      return '';
-    }
-    const [month, year] = dateString.split('-');
-    const monthIndex = parseInt(month, 10) - 1;
-    const date = new Date(parseInt(year, 10), monthIndex, 1);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short'
-    });
-  }
-
+  /**
+   * Formats and returns the duration string for an experience entry.
+   * Expects dates in MM-YYYY format (e.g., "12-2025" for December 2025).
+   * 
+   * @param startDate - Start date in MM-YYYY format
+   * @param endDate - Optional end date in MM-YYYY format
+   * @param isCurrent - Whether this is the current position
+   * @returns Formatted duration string (e.g., "Dec 2025 - Present" or "Dec 2024 - Dec 2025")
+   */
   getDuration(startDate: string, endDate?: string, isCurrent?: boolean): string {
     const [startMonth, startYear] = startDate.split('-');
     const startDateObj = new Date(parseInt(startYear, 10), parseInt(startMonth, 10) - 1, 1);

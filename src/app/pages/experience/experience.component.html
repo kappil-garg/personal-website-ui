@@ -89,6 +89,7 @@
                           {{ experience.companyName }}
                           <i
                             class="fas fa-external-link-alt external-link-icon"
+                            aria-hidden="true"
                           ></i>
                         </a>
                       } @else {
@@ -98,7 +99,7 @@
                     <h3 class="position">{{ experience.position }}</h3>
                     @if (experience.location) {
                       <p class="location">
-                        <i class="fas fa-map-marker-alt"></i>
+                        <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
                         {{ experience.location }}
                       </p>
                     }
@@ -139,7 +140,7 @@
                 ) {
                   <div class="technologies-section">
                     <h4 class="section-title">
-                      <i class="fas fa-code"></i>
+                      <i class="fas fa-code" aria-hidden="true"></i>
                       Technologies
                     </h4>
                     <div class="technologies-list">
@@ -156,7 +157,7 @@
                 ) {
                   <div class="achievements-section">
                     <h4 class="section-title">
-                      <i class="fas fa-trophy"></i>
+                      <i class="fas fa-trophy" aria-hidden="true"></i>
                       Key Achievements
                     </h4>
                     <ul class="achievements-list">
@@ -165,7 +166,7 @@
                         track $index
                       ) {
                         <li>
-                          <i class="fas fa-check-circle"></i>
+                          <i class="fas fa-check-circle" aria-hidden="true"></i>
                           {{ achievement }}
                         </li>
                       }
@@ -183,7 +184,7 @@
     @if (!loading() && !error() && experiences().length === 0) {
       <div class="empty-state">
         <div class="empty-icon">
-          <i class="fas fa-briefcase"></i>
+          <i class="fas fa-briefcase" aria-hidden="true"></i>
         </div>
         <h3>No Experience Found</h3>
         <p>Experience information will be displayed here once available.</p>
