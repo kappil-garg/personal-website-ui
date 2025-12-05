@@ -1,10 +1,193 @@
-<section class="section container hero-container">
-  <div class="coming-soon-container">
-    <div class="coming-soon-icon">💼</div>
-    <h2 class="coming-soon-title">Experience</h2>
-    <p class="coming-soon-text">This section is coming soon!</p>
-    <div class="coming-soon-description">
-      My professional journey and work experience will be detailed here.
+<section class="experience-section section">
+  <!-- Hero Section -->
+  <div class="experience-hero">
+    <div class="container">
+      <div class="hero-content">
+        <h1 class="hero-title">Work Experience</h1>
+        <p class="hero-subtitle">
+          My professional journey and the organizations I've had the privilege
+          to work with.
+        </p>
+      </div>
     </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="container">
+    <!-- Loading State -->
+    @if (loading()) {
+      <div class="loading-container">
+        <app-loading-spinner
+          message="Loading experience..."
+          size="large"
+        ></app-loading-spinner>
+      </div>
+    }
+
+    <!-- Error State -->
+    @if (!loading() && error()) {
+      <app-error-state
+        icon="fas fa-exclamation-circle"
+        title="Failed to Load Experience"
+        [message]="error()!"
+        [showRetry]="true"
+        retryText="Retry"
+        (retry)="retryLoadExperiences()"
+      ></app-error-state>
+    }
+
+    <!-- Experience Timeline -->
+    @if (!loading() && !error() && experiences().length > 0) {
+      <div class="experience-timeline">
+        @for (
+          experience of experiences();
+          track experience.id;
+          let i = $index
+        ) {
+          <div
+            class="timeline-item"
+            [attr.data-index]="i"
+            [class.current]="experience.isCurrent"
+          >
+            <!-- Timeline Line -->
+            @if (i < experiences().length - 1) {
+              <div class="timeline-line"></div>
+            }
+
+            <!-- Timeline Dot -->
+            <div class="timeline-dot">
+              <div class="dot-inner"></div>
+            </div>
+
+            <!-- Experience Card -->
+            <article class="experience-card">
+              <!-- Card Header -->
+              <div class="card-header">
+                <div class="company-info">
+                  @if (experience.companyLogo) {
+                    <div class="company-logo">
+                      <img
+                        [src]="experience.companyLogo"
+                        [alt]="experience.companyName + ' logo'"
+                      />
+                    </div>
+                  } @else {
+                    <div class="company-logo-placeholder">
+                      <span class="company-initial">{{
+                        getCompanyInitial(experience.companyName)
+                      }}</span>
+                    </div>
+                  }
+                  <div class="company-details">
+                    <h2 class="company-name">
+                      @if (experience.companyWebsite) {
+                        <a
+                          [href]="experience.companyWebsite"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {{ experience.companyName }}
+                          <i
+                            class="fas fa-external-link-alt external-link-icon"
+                          ></i>
+                        </a>
+                      } @else {
+                        {{ experience.companyName }}
+                      }
+                    </h2>
+                    <h3 class="position">{{ experience.position }}</h3>
+                    @if (experience.location) {
+                      <p class="location">
+                        <i class="fas fa-map-marker-alt"></i>
+                        {{ experience.location }}
+                      </p>
+                    }
+                  </div>
+                </div>
+                <div class="date-range">
+                  <span class="duration">{{
+                    getDuration(
+                      experience.startDate,
+                      experience.endDate,
+                      experience.isCurrent
+                    )
+                  }}</span>
+                  @if (experience.isCurrent) {
+                    <span class="current-badge">Current</span>
+                  }
+                </div>
+              </div>
+
+              <!-- Card Body -->
+              <div class="card-body">
+                <!-- Description -->
+                @if (
+                  experience.description && experience.description.length > 0
+                ) {
+                  <div class="description-section">
+                    <ul class="description-list">
+                      @for (desc of experience.description; track $index) {
+                        <li>{{ desc }}</li>
+                      }
+                    </ul>
+                  </div>
+                }
+
+                <!-- Technologies -->
+                @if (
+                  experience.technologies && experience.technologies.length > 0
+                ) {
+                  <div class="technologies-section">
+                    <h4 class="section-title">
+                      <i class="fas fa-code"></i>
+                      Technologies
+                    </h4>
+                    <div class="technologies-list">
+                      @for (tech of experience.technologies; track $index) {
+                        <span class="tech-badge">{{ tech }}</span>
+                      }
+                    </div>
+                  </div>
+                }
+
+                <!-- Achievements -->
+                @if (
+                  experience.achievements && experience.achievements.length > 0
+                ) {
+                  <div class="achievements-section">
+                    <h4 class="section-title">
+                      <i class="fas fa-trophy"></i>
+                      Key Achievements
+                    </h4>
+                    <ul class="achievements-list">
+                      @for (
+                        achievement of experience.achievements;
+                        track $index
+                      ) {
+                        <li>
+                          <i class="fas fa-check-circle"></i>
+                          {{ achievement }}
+                        </li>
+                      }
+                    </ul>
+                  </div>
+                }
+              </div>
+            </article>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Empty State -->
+    @if (!loading() && !error() && experiences().length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">
+          <i class="fas fa-briefcase"></i>
+        </div>
+        <h3>No Experience Found</h3>
+        <p>Experience information will be displayed here once available.</p>
+      </div>
+    }
   </div>
 </section>
