@@ -1,10 +1,102 @@
-<section class="section container hero-container">
-  <div class="coming-soon-container">
-    <div class="coming-soon-icon">🚀</div>
-    <h2 class="coming-soon-title">Projects</h2>
-    <p class="coming-soon-text">This section is coming soon!</p>
-    <div class="coming-soon-description">
-      Exciting projects and case studies will be showcased here.
+<section class="projects-section section">
+  <div class="projects-hero">
+    <div class="container">
+      <div class="hero-content">
+        <h1 class="hero-title">Projects</h1>
+        <p class="hero-subtitle">
+          A collection of projects I've worked on, showcasing my skills and
+          experience in software development.
+        </p>
+      </div>
     </div>
+  </div>
+
+  <div class="container">
+    @if (loading()) {
+      <div class="loading-container">
+        <app-loading-spinner
+          message="Loading projects..."
+          size="large"
+        ></app-loading-spinner>
+      </div>
+    }
+
+    @if (!loading() && error()) {
+      <app-error-state
+        icon="fas fa-exclamation-circle"
+        title="Failed to Load Projects"
+        [message]="error()!"
+        [showRetry]="true"
+        retryText="Retry"
+        (retry)="retryLoadProjects()"
+      ></app-error-state>
+    }
+
+    @if (!loading() && !error() && projects().length > 0) {
+      <div class="projects-grid">
+        @for (project of projects(); track project.id) {
+          <article class="project-card">
+            <div class="project-image">
+              <img
+                [src]="project.featuredImage"
+                [alt]="project.title"
+                loading="lazy"
+              />
+              <div class="project-overlay">
+                @if (project.projectUrl) {
+                  <a
+                    [href]="project.projectUrl"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="project-link"
+                    [attr.aria-label]="'Visit ' + project.title"
+                  >
+                    <i class="fas fa-external-link-alt" aria-hidden="true"></i>
+                    <span>View Project</span>
+                  </a>
+                }
+                @if (project.githubUrl) {
+                  <a
+                    [href]="project.githubUrl"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="project-link github-link"
+                    [attr.aria-label]="'View ' + project.title + ' on GitHub'"
+                  >
+                    <i class="fab fa-github" aria-hidden="true"></i>
+                    <span>View Code</span>
+                  </a>
+                }
+              </div>
+            </div>
+
+            <div class="project-content">
+              <h2 class="project-title">{{ project.title }}</h2>
+              <p class="project-description">
+                {{ project.shortDescription || project.description }}
+              </p>
+
+              @if (project.technologies && project.technologies.length > 0) {
+                <div class="project-technologies">
+                  @for (tech of project.technologies; track $index) {
+                    <span class="tech-badge">{{ tech }}</span>
+                  }
+                </div>
+              }
+            </div>
+          </article>
+        }
+      </div>
+    }
+
+    @if (!loading() && !error() && projects().length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">
+          <i class="fas fa-folder-open" aria-hidden="true"></i>
+        </div>
+        <h3>No Projects Found</h3>
+        <p>Project information will be displayed here once available.</p>
+      </div>
+    }
   </div>
 </section>

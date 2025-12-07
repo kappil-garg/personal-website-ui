@@ -29,20 +29,20 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
     icon: 'fas fa-project-diagram',
   },
   {
-    id: 'contact',
-    label: 'Contact',
-    route: '/contact',
+    id: 'education',
+    label: 'Education',
+    route: '/education',
     order: 4,
-    icon: 'fas fa-envelope',
+    icon: 'fas fa-graduation-cap',
   },
 ];
 
 export const FOOTER_LINKS: NavigationItem[] = [
   {
-    id: 'about-me',
-    label: 'Know More About Me',
-    route: '/about-me',
+    id: 'contact',
+    label: 'Connect with Me',
+    route: '/contact',
     order: 1,
-    icon: 'fas fa-heart',
+    icon: 'fas fa-envelope',
   },
 ];

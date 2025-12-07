@@ -126,6 +126,48 @@ export class SeoService {
     this.updateOrCreateLinkTag('canonical', url);
   }
 
+  setProjectsMetaTags(): void {
+    const title = 'Projects - Kapil Garg';
+    const url = `${this.baseUrl}/projects`;
+    const description = 'A collection of projects I\'ve worked on, showcasing my skills and experience in software development. Explore my portfolio of applications and solutions.';
+    this.title.setTitle(title);
+    this.updateOrCreateMetaTag('name', 'description', description);
+    this.updateOrCreateMetaTag('property', 'og:type', 'website');
+    this.updateOrCreateMetaTag('property', 'og:title', title);
+    this.updateOrCreateMetaTag('property', 'og:description', description);
+    this.updateOrCreateMetaTag('property', 'og:url', url);
+    this.updateOrCreateMetaTag('property', 'og:image', this.defaultImage);
+    this.updateOrCreateMetaTag('property', 'og:image:width', '1200');
+    this.updateOrCreateMetaTag('property', 'og:image:height', '630');
+    this.updateOrCreateMetaTag('property', 'og:image:alt', title);
+    this.updateOrCreateMetaTag('name', 'twitter:card', 'summary_large_image');
+    this.updateOrCreateMetaTag('name', 'twitter:title', title);
+    this.updateOrCreateMetaTag('name', 'twitter:description', description);
+    this.updateOrCreateMetaTag('name', 'twitter:image', this.defaultImage);
+    this.updateOrCreateLinkTag('canonical', url);
+  }
+
+  setContactMetaTags(): void {
+    const title = 'Contact - Kapil Garg';
+    const url = `${this.baseUrl}/contact`;
+    const description = 'Get in touch with me for collaborations, opportunities, or just to say hello. Send me a message and I\'ll respond as soon as possible.';
+    this.title.setTitle(title);
+    this.updateOrCreateMetaTag('name', 'description', description);
+    this.updateOrCreateMetaTag('property', 'og:type', 'website');
+    this.updateOrCreateMetaTag('property', 'og:title', title);
+    this.updateOrCreateMetaTag('property', 'og:description', description);
+    this.updateOrCreateMetaTag('property', 'og:url', url);
+    this.updateOrCreateMetaTag('property', 'og:image', this.defaultImage);
+    this.updateOrCreateMetaTag('property', 'og:image:width', '1200');
+    this.updateOrCreateMetaTag('property', 'og:image:height', '630');
+    this.updateOrCreateMetaTag('property', 'og:image:alt', title);
+    this.updateOrCreateMetaTag('name', 'twitter:card', 'summary_large_image');
+    this.updateOrCreateMetaTag('name', 'twitter:title', title);
+    this.updateOrCreateMetaTag('name', 'twitter:description', description);
+    this.updateOrCreateMetaTag('name', 'twitter:image', this.defaultImage);
+    this.updateOrCreateLinkTag('canonical', url);
+  }
+
   setDefaultMetaTags(): void {
     this.title.setTitle(this.defaultTitle);
     this.updateOrCreateMetaTag('name', 'description', this.defaultDescription);
