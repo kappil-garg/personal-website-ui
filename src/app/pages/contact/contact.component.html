@@ -1,11 +1,201 @@
-<section class="section container hero-container">
-  <div class="coming-soon-container">
-    <div class="coming-soon-icon">📧</div>
-    <h2 class="coming-soon-title">Contact</h2>
-    <p class="coming-soon-text">This section is coming soon!</p>
-    <div class="coming-soon-description">
-      Get in touch with me for collaborations, opportunities, or just to say
-      hello.
+<section class="contact-section section">
+  <div class="contact-hero">
+    <div class="container">
+      <div class="hero-content">
+        <h1 class="hero-title">Get In Touch</h1>
+        <p class="hero-subtitle">
+          Have a question or want to work together? I'd love to hear from you.
+          Send me a message and I'll respond as soon as possible.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="contact-layout">
+      <div class="contact-info">
+        <h2 class="section-title">You can reach out to me</h2>
+        <p class="section-description">
+          Feel free to connect with me through any of these platforms or send me
+          a message using the form.
+        </p>
+
+        @if (personalInfo()) {
+          <div class="social-links-container">
+            @if (personalInfo()!.socialLinks) {
+              <div class="social-links">
+                @if (personalInfo()!.socialLinks!.linkedin) {
+                  <a
+                    [href]="personalInfo()!.socialLinks!.linkedin"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="social-link social-link-linkedin"
+                    aria-label="LinkedIn Profile"
+                    title="LinkedIn"
+                  >
+                    <i class="fab fa-linkedin" aria-hidden="true"></i>
+                    <span>LinkedIn</span>
+                  </a>
+                }
+                @if (personalInfo()!.socialLinks!.github) {
+                  <a
+                    [href]="personalInfo()!.socialLinks!.github"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="social-link social-link-github"
+                    aria-label="GitHub Profile"
+                    title="GitHub"
+                  >
+                    <i class="fab fa-github" aria-hidden="true"></i>
+                    <span>GitHub</span>
+                  </a>
+                }
+                @if (personalInfo()!.socialLinks!.twitter) {
+                  <a
+                    [href]="personalInfo()!.socialLinks!.twitter"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="social-link social-link-twitter"
+                    aria-label="Twitter Profile"
+                    title="Twitter"
+                  >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                    <span>Twitter</span>
+                  </a>
+                }
+              </div>
+            }
+          </div>
+        }
+
+        <div class="about-me-navigation">
+          <p class="about-me-intro">
+            If you'd like to know more about me, my journey, and what drives me,
+            feel free to explore my story.
+          </p>
+          <a routerLink="/about-me" class="about-me-link">
+            <i class="fas fa-user" aria-hidden="true"></i>
+            <span>Learn More About Me</span>
+            <i class="fas fa-arrow-right" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
+
+      <div class="contact-form-container">
+        <h2 class="section-title">Send me a message</h2>
+        <form
+          [formGroup]="contactForm"
+          (ngSubmit)="onSubmit()"
+          class="contact-form"
+          novalidate
+        >
+          <div class="form-group">
+            <label for="name" class="form-label">
+              Name <span class="required">*</span>
+            </label>
+            <input
+              type="text"
+              id="name"
+              formControlName="name"
+              class="form-input"
+              [class.invalid]="isFieldInvalid('name')"
+              placeholder="Your name"
+              aria-describedby="name-error"
+            />
+            @if (getFieldError("name")) {
+              <span class="error-message" id="name-error" role="alert">
+                {{ getFieldError("name") }}
+              </span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="email" class="form-label">
+              Email <span class="required">*</span>
+            </label>
+            <input
+              type="email"
+              id="email"
+              formControlName="email"
+              class="form-input"
+              [class.invalid]="isFieldInvalid('email')"
+              placeholder="your.email@example.com"
+              aria-describedby="email-error"
+            />
+            @if (getFieldError("email")) {
+              <span class="error-message" id="email-error" role="alert">
+                {{ getFieldError("email") }}
+              </span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="subject" class="form-label">Subject</label>
+            <input
+              type="text"
+              id="subject"
+              formControlName="subject"
+              class="form-input"
+              [class.invalid]="isFieldInvalid('subject')"
+              placeholder="What's this about?"
+              aria-describedby="subject-error"
+            />
+            @if (getFieldError("subject")) {
+              <span class="error-message" id="subject-error" role="alert">
+                {{ getFieldError("subject") }}
+              </span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="message" class="form-label">
+              Message <span class="required">*</span>
+            </label>
+            <textarea
+              id="message"
+              formControlName="message"
+              class="form-textarea"
+              [class.invalid]="isFieldInvalid('message')"
+              placeholder="Your message here..."
+              rows="6"
+              aria-describedby="message-error"
+            ></textarea>
+            @if (getFieldError("message")) {
+              <span class="error-message" id="message-error" role="alert">
+                {{ getFieldError("message") }}
+              </span>
+            }
+          </div>
+
+          @if (error()) {
+            <div class="form-error" role="alert">
+              <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
+              <span>{{ error() }}</span>
+            </div>
+          }
+
+          @if (success()) {
+            <div class="form-success" role="alert">
+              <i class="fas fa-check-circle" aria-hidden="true"></i>
+              <span>Message sent successfully! I'll get back to you soon.</span>
+            </div>
+          }
+
+          <button
+            type="submit"
+            class="submit-button"
+            [disabled]="loading() || contactForm.invalid"
+          >
+            @if (loading()) {
+              <i class="fas fa-spinner fa-spin" aria-hidden="true"></i>
+              <span>Sending...</span>
+            } @else {
+              <i class="fas fa-paper-plane" aria-hidden="true"></i>
+              <span>Send Message</span>
+            }
+          </button>
+        </form>
+      </div>
     </div>
   </div>
 </section>
