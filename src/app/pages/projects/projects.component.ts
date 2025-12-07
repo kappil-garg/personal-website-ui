@@ -58,7 +58,15 @@ export class ProjectsComponent implements OnInit {
   retryLoadProjects(): void {
     this.projectService.fetchProjects({ forceRefresh: true }).pipe(
       takeUntilDestroyed(this.destroyRef)
-    ).subscribe();
+    ).subscribe({
+      next: () => {
+        this.cdr.markForCheck();
+      },
+      error: (error) => {
+        this.environmentService.warn('Failed to load projects:', error);
+        this.cdr.markForCheck();
+      }
+    });
   }
 
 }
