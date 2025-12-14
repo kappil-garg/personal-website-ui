@@ -21,7 +21,7 @@
       </div>
     }
 
-    @if (!loading() && error()) {
+    @if (!loading() && hasError()) {
       <app-error-state
         icon="fas fa-exclamation-circle"
         title="Failed to Load Projects"
@@ -32,7 +32,7 @@
       ></app-error-state>
     }
 
-    @if (!loading() && !error() && projects().length > 0) {
+    @if (!loading() && !hasError() && projects().length > 0) {
       <div class="projects-grid">
         @for (project of projects(); track project.id) {
           <article class="project-card">
@@ -89,7 +89,7 @@
       </div>
     }
 
-    @if (!loading() && !error() && projects().length === 0) {
+    @if (!loading() && !hasError() && projects().length === 0) {
       <div class="empty-state">
         <div class="empty-icon">
           <i class="fas fa-folder-open" aria-hidden="true"></i>

@@ -44,6 +44,7 @@ export class ExperienceService {
     if (shouldUseCache) {
       return of(this.experiencesSignal());
     }
+    this.errorSignal.set(null);
     this.loadingSignal.set(true);
     return this.http.get<ApiResponse<Experience[]>>(`${this.API_BASE_URL}`).pipe(
       timeout(this.REQUEST_TIMEOUT_MS),

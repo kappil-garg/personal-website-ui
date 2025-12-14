@@ -89,7 +89,8 @@ export class BlogsComponent implements OnInit, OnDestroy {
   error = computed(() => this.blogService.error());
   sortOrder = computed(() => this.sortOrderSignal());
   searchTerm = computed(() => this.searchTermSignal());
-  loading = computed(() => this.blogService.loading());
+  hasError = computed(() => !!this.blogService.error());
+  loading = computed(() => this.blogService.loading() && !this.hasError());
   selectedCategory = computed(() => this.selectedCategorySignal());
 
   ngOnInit(): void {

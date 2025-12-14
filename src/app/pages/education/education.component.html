@@ -1,11 +1,333 @@
-<section class="section container hero-container">
-  <div class="coming-soon-container">
-    <div class="coming-soon-icon">🎓</div>
-    <h2 class="coming-soon-title">Education</h2>
-    <p class="coming-soon-text">This section is coming soon!</p>
-    <div class="coming-soon-description">
-      My academic background and educational achievements will be displayed
-      here.
+<section class="education-section section">
+  <!-- Hero Section -->
+  <div class="education-hero">
+    <div class="container">
+      <div class="hero-content">
+        <h1 class="hero-title">Education & Certifications</h1>
+        <p class="hero-subtitle">
+          My academic journey, professional degrees, and continuous learning
+          through certifications and professional development.
+        </p>
+      </div>
     </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="container">
+    <!-- Loading State -->
+    @if (isLoading()) {
+      <div class="loading-container">
+        <app-loading-spinner
+          message="Loading education and certifications..."
+          size="large"
+        ></app-loading-spinner>
+      </div>
+    }
+
+    <!-- Error State -->
+    @if (hasError() && !isLoading()) {
+      <div class="error-container">
+        <app-error-state
+          icon="fas fa-exclamation-circle"
+          title="Unable to Load Education & Certifications"
+          message="Education and certification data are temporarily unavailable. Please try again later."
+          [showRetry]="true"
+          retryText="Retry"
+          (retry)="retryLoadAll()"
+        ></app-error-state>
+      </div>
+    }
+
+    <!-- Tab Switcher -->
+    @if (!isLoading() && !hasError()) {
+      <div class="tab-switcher">
+        <button
+          class="tab-button"
+          [class.active]="activeTab() === 'degrees'"
+          (click)="switchTab('degrees')"
+          [attr.aria-pressed]="activeTab() === 'degrees'"
+          [attr.aria-label]="'Show professional degrees'"
+        >
+          <i class="fas fa-graduation-cap" aria-hidden="true"></i>
+          <span>Professional Degrees</span>
+        </button>
+        <button
+          class="tab-button"
+          [class.active]="activeTab() === 'certifications'"
+          (click)="switchTab('certifications')"
+          [attr.aria-pressed]="activeTab() === 'certifications'"
+          [attr.aria-label]="'Show certifications and courses'"
+        >
+          <i class="fas fa-certificate" aria-hidden="true"></i>
+          <span>Certifications & Courses</span>
+        </button>
+      </div>
+    }
+
+    <!-- Professional Degrees Tab Content -->
+    @if (!isLoading() && !hasError() && activeTab() === "degrees") {
+      @if (educations().length > 0) {
+        <div class="section-container">
+          <div class="section-header">
+            <h2 class="section-title">
+              <i class="fas fa-graduation-cap" aria-hidden="true"></i>
+              Professional Degrees
+            </h2>
+            <p class="section-subtitle">
+              My academic qualifications and professional degrees
+            </p>
+          </div>
+
+          <div class="education-timeline">
+            @for (
+              education of educations();
+              track education.id;
+              let i = $index
+            ) {
+              <div
+                class="timeline-item"
+                [attr.data-index]="i"
+                [class.current]="education.isCurrent"
+              >
+                <!-- Timeline Line -->
+                @if (i < educations().length - 1) {
+                  <div class="timeline-line"></div>
+                }
+
+                <!-- Timeline Dot -->
+                <div class="timeline-dot">
+                  <div class="dot-inner"></div>
+                </div>
+
+                <!-- Education Card -->
+                <article class="education-card">
+                  <!-- Card Header -->
+                  <div class="card-header">
+                    <div class="institution-info">
+                      @if (
+                        education.institutionLogo &&
+                        !hasEducationLogoFailed(education.id!)
+                      ) {
+                        <div class="institution-logo">
+                          <img
+                            [src]="education.institutionLogo"
+                            [alt]="education.institutionName + ' logo'"
+                            (error)="
+                              onEducationLogoError(education.id!, $event)
+                            "
+                          />
+                        </div>
+                      } @else {
+                        <div class="institution-logo-placeholder">
+                          <span class="institution-initial">{{
+                            getInstitutionInitial(education.institutionName)
+                          }}</span>
+                        </div>
+                      }
+                      <div class="institution-details">
+                        <h3 class="degree-name">{{ education.degree }}</h3>
+                        <h4 class="field-of-study">
+                          {{ education.fieldOfStudy }}
+                        </h4>
+                        <h5 class="institution-name">
+                          @if (education.institutionWebsite) {
+                            <a
+                              [href]="education.institutionWebsite"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              {{ education.institutionName }}
+                              <i
+                                class="fas fa-external-link-alt external-link-icon"
+                                aria-hidden="true"
+                              ></i>
+                            </a>
+                          } @else {
+                            {{ education.institutionName }}
+                          }
+                        </h5>
+                        @if (education.location) {
+                          <p class="location">
+                            <i
+                              class="fas fa-map-marker-alt"
+                              aria-hidden="true"
+                            ></i>
+                            {{ education.location }}
+                          </p>
+                        }
+                      </div>
+                    </div>
+                    <div class="date-range">
+                      <span class="duration">{{
+                        getDuration(
+                          education.startDate,
+                          education.endDate,
+                          education.isCurrent
+                        )
+                      }}</span>
+                      @if (education.isCurrent) {
+                        <span class="current-badge">Current</span>
+                      }
+                    </div>
+                  </div>
+
+                  <!-- Card Body -->
+                  @if (education.description) {
+                    <div class="card-body">
+                      <p class="description">{{ education.description }}</p>
+                    </div>
+                  }
+                </article>
+              </div>
+            }
+          </div>
+        </div>
+      } @else {
+        <div class="empty-state">
+          <div class="empty-icon">
+            <i class="fas fa-graduation-cap" aria-hidden="true"></i>
+          </div>
+          <h3>No Education Found</h3>
+          <p>Education information will be displayed here once available.</p>
+        </div>
+      }
+    }
+
+    <!-- Certifications Tab Content -->
+    @if (!isLoading() && !hasError() && activeTab() === "certifications") {
+      @if (certifications().length > 0) {
+        <div class="section-container">
+          <div class="section-header">
+            <h2 class="section-title">
+              <i class="fas fa-certificate" aria-hidden="true"></i>
+              Certifications & Courses
+            </h2>
+            <p class="section-subtitle">
+              Industry certifications, online courses, and professional
+              development programs I've completed
+            </p>
+          </div>
+
+          <div class="certifications-grid">
+            @for (certification of certifications(); track certification.id) {
+              <article class="certification-card">
+                <!-- Card Header -->
+                <div class="card-header">
+                  <div class="organization-info">
+                    @if (
+                      certification.organizationLogo &&
+                      !hasCertificationLogoFailed(certification.id)
+                    ) {
+                      <div class="organization-logo">
+                        <img
+                          [src]="certification.organizationLogo"
+                          [alt]="certification.issuingOrganization + ' logo'"
+                          (error)="
+                            onCertificationLogoError(certification.id, $event)
+                          "
+                        />
+                      </div>
+                    } @else {
+                      <div class="organization-logo-placeholder">
+                        <span class="organization-initial">{{
+                          getOrganizationInitial(
+                            certification.issuingOrganization
+                          )
+                        }}</span>
+                      </div>
+                    }
+                    <div class="organization-details">
+                      <h3 class="certification-name">
+                        @if (certification.credentialUrl) {
+                          <a
+                            [href]="certification.credentialUrl"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {{ certification.certificationName }}
+                            <i
+                              class="fas fa-external-link-alt external-link-icon"
+                              aria-hidden="true"
+                            ></i>
+                          </a>
+                        } @else {
+                          {{ certification.certificationName }}
+                        }
+                      </h3>
+                      <h4 class="organization-name">
+                        @if (certification.organizationWebsite) {
+                          <a
+                            [href]="certification.organizationWebsite"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {{ certification.issuingOrganization }}
+                            <i
+                              class="fas fa-external-link-alt external-link-icon"
+                              aria-hidden="true"
+                            ></i>
+                          </a>
+                        } @else {
+                          {{ certification.issuingOrganization }}
+                        }
+                      </h4>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Card Body -->
+                <div class="card-body">
+                  @if (certification.issueDate) {
+                    <div class="certification-date">
+                      <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+                      <span>{{
+                        getCertificationDate(
+                          certification.issueDate,
+                          certification.expirationDate,
+                          certification.doesNotExpire
+                        )
+                      }}</span>
+                    </div>
+                  }
+                  @if (certification.description) {
+                    <p class="description">{{ certification.description }}</p>
+                  }
+                </div>
+              </article>
+            }
+          </div>
+        </div>
+      } @else {
+        <div class="empty-state">
+          <div class="empty-icon">
+            <i class="fas fa-certificate" aria-hidden="true"></i>
+          </div>
+          <h3>No Certifications or Courses Found</h3>
+          <p>
+            Certification and course information will be displayed here once
+            available.
+          </p>
+        </div>
+      }
+    }
+
+    <!-- Empty State (when both are empty) -->
+    @if (
+      !isLoading() &&
+      !hasError() &&
+      educations().length === 0 &&
+      certifications().length === 0
+    ) {
+      <div class="empty-state">
+        <div class="empty-icon">
+          <i class="fas fa-graduation-cap" aria-hidden="true"></i>
+        </div>
+        <h3>No Education or Certifications Found</h3>
+        <p>
+          Education, certification, and course information will be displayed
+          here once available.
+        </p>
+      </div>
+    }
   </div>
 </section>

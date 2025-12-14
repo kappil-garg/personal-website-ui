@@ -29,7 +29,8 @@ export class ProjectsComponent implements OnInit {
   private environmentService = inject(EnvironmentService);
 
   error = computed(() => this.projectService.error());
-  loading = computed(() => this.projectService.loading());
+  hasError = computed(() => !!this.projectService.error());
+  loading = computed(() => this.projectService.loading() && !this.hasError());
   projects = computed(() => this.projectService.projects());
 
   ngOnInit(): void {

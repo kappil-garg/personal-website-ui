@@ -15,11 +15,11 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
     icon: 'fas fa-briefcase',
   },
   {
-    id: 'blogs',
-    label: 'Blogs',
-    route: '/blogs',
+    id: 'skills',
+    label: 'Skills',
+    route: '/skills',
     order: 2,
-    icon: 'fas fa-blog',
+    icon: 'fas fa-code',
   },
   {
     id: 'projects',
@@ -34,6 +34,13 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
     route: '/education',
     order: 4,
     icon: 'fas fa-graduation-cap',
+  },
+  {
+    id: 'blogs',
+    label: 'Blogs',
+    route: '/blogs',
+    order: 5,
+    icon: 'fas fa-blog',
   },
 ];
 

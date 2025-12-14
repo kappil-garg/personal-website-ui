@@ -33,6 +33,7 @@ export class BlogService {
     if (shouldUseCache) {
       return of(this.blogsSignal());
     }
+    this.errorSignal.set(null);
     this.loadingSignal.set(true);
     return this.http.get<ApiResponse<Blog[]>>(`${this.API_BASE_URL}/published`).pipe(
       timeout(this.REQUEST_TIMEOUT_MS),

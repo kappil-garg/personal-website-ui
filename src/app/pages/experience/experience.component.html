@@ -25,7 +25,7 @@
     }
 
     <!-- Error State -->
-    @if (!loading() && error()) {
+    @if (!loading() && hasError()) {
       <app-error-state
         icon="fas fa-exclamation-circle"
         title="Failed to Load Experience"
@@ -37,7 +37,7 @@
     }
 
     <!-- Experience Timeline -->
-    @if (!loading() && !error() && experiences().length > 0) {
+    @if (!loading() && !hasError() && experiences().length > 0) {
       <div class="experience-timeline">
         @for (
           experience of experiences();
@@ -181,7 +181,7 @@
     }
 
     <!-- Empty State -->
-    @if (!loading() && !error() && experiences().length === 0) {
+    @if (!loading() && !hasError() && experiences().length === 0) {
       <div class="empty-state">
         <div class="empty-icon">
           <i class="fas fa-briefcase" aria-hidden="true"></i>

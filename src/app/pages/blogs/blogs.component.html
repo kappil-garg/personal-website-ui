@@ -119,7 +119,7 @@
             <div class="empty-icon">
               <i class="fas fa-file-alt"></i>
             </div>
-            @if (error() && blogService.blogs().length === 0) {
+            @if (hasError() && blogService.blogs().length === 0) {
               <!-- API Error: Can't load blogs -->
               <h3>Unable to load blogs</h3>
               <p>We're having trouble connecting. Please try again.</p>
@@ -145,7 +145,7 @@
         }
 
         <!-- Blog Posts -->
-        @if (!loading() && !error() && filteredBlogs().length > 0) {
+        @if (!loading() && !hasError() && filteredBlogs().length > 0) {
           <div class="blogs-grid">
             @for (blog of filteredBlogs(); track $index; let i = $index) {
               <article class="blog-card" [attr.data-category]="blog.category">
