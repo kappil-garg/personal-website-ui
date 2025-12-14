@@ -42,8 +42,10 @@ export class EducationService {
   fetchEducations(options: { forceRefresh?: boolean } = {}): Observable<Education[]> {
     const shouldUseCache = !options.forceRefresh && this.hasFetched && this.isCacheFresh();
     if (shouldUseCache) {
+      this.errorSignal.set(null);
       return of(this.educationsSignal());
     }
+    this.errorSignal.set(null);
     this.loadingSignal.set(true);
     return this.http.get<ApiResponse<Education[]>>(`${this.API_BASE_URL}`).pipe(
       timeout(this.REQUEST_TIMEOUT_MS),
