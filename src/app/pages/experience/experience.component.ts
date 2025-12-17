@@ -28,8 +28,9 @@ export class ExperienceComponent implements OnInit {
   public experienceService = inject(ExperienceService);
 
   experiences = computed(() => this.experienceService.experiences());
-  loading = computed(() => this.experienceService.loading());
   error = computed(() => this.experienceService.error());
+  hasError = computed(() => !!this.experienceService.error());
+  loading = computed(() => this.experienceService.loading() && !this.hasError());
 
   ngOnInit(): void {
     this.seoService.setExperienceMetaTags();

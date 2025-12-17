@@ -40,8 +40,8 @@ export const routes: Routes = [
   },
   {
     path: 'certifications',
-    loadComponent: () => import('./pages/certifications/certifications.component').then(m => m.CertificationsComponent),
-    title: 'Certifications - Kapil Garg'
+    redirectTo: '/education',
+    pathMatch: 'full'
   },
   {
     path: 'blogs',

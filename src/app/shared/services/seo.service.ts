@@ -147,6 +147,48 @@ export class SeoService {
     this.updateOrCreateLinkTag('canonical', url);
   }
 
+  setEducationMetaTags(): void {
+    const title = 'Education - Kapil Garg';
+    const url = `${this.baseUrl}/education`;
+    const description = 'My academic journey and professional degrees. Explore my educational background and qualifications.';
+    this.title.setTitle(title);
+    this.updateOrCreateMetaTag('name', 'description', description);
+    this.updateOrCreateMetaTag('property', 'og:type', 'website');
+    this.updateOrCreateMetaTag('property', 'og:title', title);
+    this.updateOrCreateMetaTag('property', 'og:description', description);
+    this.updateOrCreateMetaTag('property', 'og:url', url);
+    this.updateOrCreateMetaTag('property', 'og:image', this.defaultImage);
+    this.updateOrCreateMetaTag('property', 'og:image:width', '1200');
+    this.updateOrCreateMetaTag('property', 'og:image:height', '630');
+    this.updateOrCreateMetaTag('property', 'og:image:alt', title);
+    this.updateOrCreateMetaTag('name', 'twitter:card', 'summary_large_image');
+    this.updateOrCreateMetaTag('name', 'twitter:title', title);
+    this.updateOrCreateMetaTag('name', 'twitter:description', description);
+    this.updateOrCreateMetaTag('name', 'twitter:image', this.defaultImage);
+    this.updateOrCreateLinkTag('canonical', url);
+  }
+
+  setCertificationsMetaTags(): void {
+    const title = 'Certifications - Kapil Garg';
+    const url = `${this.baseUrl}/certifications`;
+    const description = 'Professional certifications and courses I\'ve completed. Explore my continuous learning journey and professional development achievements.';
+    this.title.setTitle(title);
+    this.updateOrCreateMetaTag('name', 'description', description);
+    this.updateOrCreateMetaTag('property', 'og:type', 'website');
+    this.updateOrCreateMetaTag('property', 'og:title', title);
+    this.updateOrCreateMetaTag('property', 'og:description', description);
+    this.updateOrCreateMetaTag('property', 'og:url', url);
+    this.updateOrCreateMetaTag('property', 'og:image', this.defaultImage);
+    this.updateOrCreateMetaTag('property', 'og:image:width', '1200');
+    this.updateOrCreateMetaTag('property', 'og:image:height', '630');
+    this.updateOrCreateMetaTag('property', 'og:image:alt', title);
+    this.updateOrCreateMetaTag('name', 'twitter:card', 'summary_large_image');
+    this.updateOrCreateMetaTag('name', 'twitter:title', title);
+    this.updateOrCreateMetaTag('name', 'twitter:description', description);
+    this.updateOrCreateMetaTag('name', 'twitter:image', this.defaultImage);
+    this.updateOrCreateLinkTag('canonical', url);
+  }
+
   setContactMetaTags(): void {
     const title = 'Contact - Kapil Garg';
     const url = `${this.baseUrl}/contact`;

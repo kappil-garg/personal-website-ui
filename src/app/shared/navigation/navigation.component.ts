@@ -27,7 +27,9 @@ export class NavigationComponent implements OnDestroy {
   currentRoute = signal('');
   isMobileMenuOpen = signal(false);
   isScrolled = signal(false);
-  navigationItems = signal<NavigationItem[]>(NAVIGATION_ITEMS);
+  navigationItems = signal<NavigationItem[]>(
+    [...NAVIGATION_ITEMS].sort((a, b) => a.order - b.order)
+  );
 
   constructor() {
     this.setupRouteTracking();
