@@ -51,7 +51,7 @@
               <h2 class="category-title">{{ skillCategory.categoryName }}</h2>
             </div>
             <div class="skills-grid">
-              @for (skill of skillCategory.skills; track $index) {
+              @for (skill of skillCategory.skills; track skill) {
                 <div class="skill-item" [attr.data-skill]="skill">
                   <span class="skill-name">{{ skill }}</span>
                 </div>

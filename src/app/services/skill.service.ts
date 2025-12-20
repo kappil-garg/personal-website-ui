@@ -53,9 +53,15 @@ export class SkillService {
       timeout(this.REQUEST_TIMEOUT_MS),
       map(response => {
         const skills = response.data || [];
-        const sortedSkills = skills.sort((a, b) => 
-          (a.displayOrder ?? 0) - (b.displayOrder ?? 0)
-        );
+        // Use stable sort: first by displayOrder, then by original index to preserve API order
+        const sortedSkills = skills
+          .map((skill, index) => ({ skill, originalIndex: index }))
+          .sort((a, b) => {
+            const orderDiff = (a.skill.displayOrder ?? 0) - (b.skill.displayOrder ?? 0);
+            // If displayOrder is the same, maintain original order
+            return orderDiff !== 0 ? orderDiff : a.originalIndex - b.originalIndex;
+          })
+          .map(item => item.skill);
         this.skillsSignal.set(sortedSkills);
         this.errorSignal.set(null);
         this.hasFetched = true;

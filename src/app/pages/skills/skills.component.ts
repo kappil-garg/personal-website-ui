@@ -36,7 +36,7 @@ export class SkillsComponent implements OnInit {
 
   ngOnInit(): void {
     this.seoService.setSkillsMetaTags();
-    if (!this.skillService.hasDataLoaded && !this.skillService.loading()) {
+    if (!this.skillService.hasDataLoaded && !this.skillService.loading() && !this.skillService.error()) {
       this.loadSkills();
     } else {
       this.cdr.markForCheck();
@@ -49,10 +49,6 @@ export class SkillsComponent implements OnInit {
     ).subscribe({
       next: () => {
         this.cdr.markForCheck();
-      },
-      error: (error) => {
-        this.environmentService.warn('Failed to load skills:', error);
-        this.cdr.markForCheck();
       }
     });
   }
@@ -60,7 +56,11 @@ export class SkillsComponent implements OnInit {
   retryLoadSkills(): void {
     this.skillService.fetchSkills({ forceRefresh: true }).pipe(
       takeUntilDestroyed(this.destroyRef)
-    ).subscribe();
+    ).subscribe({
+      next: () => {
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   getCategoryIcon(categoryName: string): string {
