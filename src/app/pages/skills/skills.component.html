@@ -1,10 +1,76 @@
-<section class="section container hero-container">
-  <div class="coming-soon-container">
-    <div class="coming-soon-icon">⭐</div>
-    <h2 class="coming-soon-title">Skills</h2>
-    <p class="coming-soon-text">This section is coming soon!</p>
-    <div class="coming-soon-description">
-      My technical skills and expertise will be showcased here.
+<section class="skills-section section">
+  <!-- Hero Section -->
+  <div class="skills-hero">
+    <div class="container">
+      <div class="hero-content">
+        <h1 class="hero-title">Technical Skills</h1>
+        <p class="hero-subtitle">
+          A comprehensive overview of the technologies, tools, and frameworks I
+          work with to build modern, scalable applications.
+        </p>
+      </div>
     </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="container">
+    <!-- Loading State -->
+    @if (loading()) {
+      <div class="loading-container">
+        <app-loading-spinner
+          message="Loading skills..."
+          size="large"
+        ></app-loading-spinner>
+      </div>
+    }
+
+    <!-- Error State -->
+    @if (!loading() && hasError()) {
+      <app-error-state
+        icon="fas fa-exclamation-circle"
+        title="Failed to Load Skills"
+        [message]="error()!"
+        [showRetry]="true"
+        retryText="Retry"
+        (retry)="retryLoadSkills()"
+      ></app-error-state>
+    }
+
+    <!-- Skills Content -->
+    @if (!loading() && !hasError() && skills().length > 0) {
+      <div class="skills-container">
+        @for (skillCategory of skills(); track skillCategory.id) {
+          <div class="skill-category-section">
+            <div class="category-header">
+              <div class="category-icon-wrapper">
+                <i
+                  [class]="getCategoryIcon(skillCategory.categoryName)"
+                  aria-hidden="true"
+                ></i>
+              </div>
+              <h2 class="category-title">{{ skillCategory.categoryName }}</h2>
+            </div>
+            <div class="skills-grid">
+              @for (skill of skillCategory.skills; track skill) {
+                <div class="skill-item" [attr.data-skill]="skill">
+                  <span class="skill-name">{{ skill }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Empty State -->
+    @if (!loading() && !hasError() && skills().length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">
+          <i class="fas fa-code" aria-hidden="true"></i>
+        </div>
+        <h3>No Skills Found</h3>
+        <p>Skills information will be displayed here once available.</p>
+      </div>
+    }
   </div>
 </section>

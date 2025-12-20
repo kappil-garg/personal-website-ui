@@ -210,6 +210,27 @@ export class SeoService {
     this.updateOrCreateLinkTag('canonical', url);
   }
 
+  setSkillsMetaTags(): void {
+    const title = 'Skills - Kapil Garg';
+    const url = `${this.baseUrl}/skills`;
+    const description = 'A comprehensive overview of my technical skills, including programming languages, frameworks, tools, and technologies I work with to build modern applications.';
+    this.title.setTitle(title);
+    this.updateOrCreateMetaTag('name', 'description', description);
+    this.updateOrCreateMetaTag('property', 'og:type', 'website');
+    this.updateOrCreateMetaTag('property', 'og:title', title);
+    this.updateOrCreateMetaTag('property', 'og:description', description);
+    this.updateOrCreateMetaTag('property', 'og:url', url);
+    this.updateOrCreateMetaTag('property', 'og:image', this.defaultImage);
+    this.updateOrCreateMetaTag('property', 'og:image:width', '1200');
+    this.updateOrCreateMetaTag('property', 'og:image:height', '630');
+    this.updateOrCreateMetaTag('property', 'og:image:alt', title);
+    this.updateOrCreateMetaTag('name', 'twitter:card', 'summary_large_image');
+    this.updateOrCreateMetaTag('name', 'twitter:title', title);
+    this.updateOrCreateMetaTag('name', 'twitter:description', description);
+    this.updateOrCreateMetaTag('name', 'twitter:image', this.defaultImage);
+    this.updateOrCreateLinkTag('canonical', url);
+  }
+
   setDefaultMetaTags(): void {
     this.title.setTitle(this.defaultTitle);
     this.updateOrCreateMetaTag('name', 'description', this.defaultDescription);
