@@ -1,7 +1,6 @@
 import { Component, OnInit, computed, inject, ChangeDetectionStrategy, ChangeDetectorRef, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { PortfolioService } from '../../services/portfolio.service';
 import { ContactService } from '../../services/contact.service';
@@ -13,7 +12,6 @@ import { SeoService } from '../../shared/services/seo.service';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    RouterLink,
   ],
   templateUrl: './contact.component.html',
   styleUrl: './contact.component.scss',

@@ -11,7 +11,6 @@ export class IconService {
 
   private readonly navigationIconMap = new Map<string, string>([
     ['home', 'fas fa-home'],
-    ['about-me', 'fas fa-heart'],
     ['experience', 'fas fa-briefcase'],
     ['education', 'fas fa-graduation-cap'],
     ['skills', 'fas fa-code'],

@@ -14,11 +14,6 @@ export const routes: Routes = [
     title: 'Kapil Garg - Java Full Stack Developer & Tech Explorer'
   },
   {
-    path: 'about-me',
-    loadComponent: () => import('./pages/about-me/about-me.component').then(m => m.AboutMeComponent),
-    title: 'About Me - Kapil Garg'
-  },
-  {
     path: 'experience',
     loadComponent: () => import('./pages/experience/experience.component').then(m => m.ExperienceComponent),
     title: 'Experience - Kapil Garg'
