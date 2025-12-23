@@ -65,7 +65,21 @@
 </nav>
 
 <!-- Mobile Navigation Menu -->
-<div class="mobile-nav-menu" [class.active]="isMobileMenuOpen()">
+@if (isMobileMenuOpen()) {
+  <div 
+    class="mobile-nav-menu-backdrop"
+    tabindex="0"
+    role="button"
+    aria-label="Close mobile menu"
+    (click)="closeMobileMenu()"
+    (keydown)="onBackdropKeyDown($event)"
+  ></div>
+}
+<div 
+  class="mobile-nav-menu" 
+  [class.active]="isMobileMenuOpen()"
+  (click)="$event.stopPropagation()"
+>
   <div class="nav-tabs">
     @for (item of navigationItems(); track item.id) {
       <div class="nav-tab" [class.active]="isCurrentRoute(item.route)">

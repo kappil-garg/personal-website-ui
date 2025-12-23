@@ -24,12 +24,11 @@ export class SeoService {
     const url = `${this.baseUrl}/blogs/${blog.slug}`;
     const description = blog.excerpt || this.defaultDescription;
 
-    let image = blog.featuredImage || this.defaultImage;
-    if (image && !image.startsWith('http://') && !image.startsWith('https://')) {
-      image = image.startsWith('/') 
-        ? `${this.baseUrl}${image}` 
-        : `${this.baseUrl}/${image}`;
-    }
+    // Prioritize featured image, only fallback to default if truly missing
+    const featuredImage = blog.featuredImage?.trim();
+    const image = featuredImage 
+      ? this.normalizeImageUrl(featuredImage)
+      : this.defaultImage;
     
     const modifiedTime = blog.updatedAt;
     const publishedTime = blog.publishedAt || blog.createdAt;
@@ -295,6 +294,20 @@ export class SeoService {
       'svg': 'image/svg+xml',
     };
     return typeMap[extension] || 'image/png';
+  }
+
+  /**
+   * Normalizes image URL to ensure it's always absolute for social media crawlers.
+   * Handles relative paths, absolute paths, and already absolute URLs.
+   */
+  private normalizeImageUrl(imageUrl: string): string {
+    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+      return imageUrl;
+    }
+    if (imageUrl.startsWith('/')) {
+      return `${this.baseUrl}${imageUrl}`;
+    }
+    return `${this.baseUrl}/${imageUrl}`;
   }
 
 }

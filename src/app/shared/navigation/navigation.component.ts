@@ -42,6 +42,13 @@ export class NavigationComponent implements OnDestroy {
     }
   }
 
+  onBackdropKeyDown(event: KeyboardEvent): void {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      this.closeMobileMenu();
+    }
+  }
+
   @HostListener('window:scroll')
   onWindowScroll(): void {
     if (!isPlatformBrowser(this.platformId)) {
@@ -52,6 +59,16 @@ export class NavigationComponent implements OnDestroy {
     this.isScrolled.set(scrollY > 10);
   }
 
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+    if (window.innerWidth >= 1024 && this.isMobileMenuOpen()) {
+      this.closeMobileMenu();
+    }
+  }
+
   private setupRouteTracking(): void {
     this.router.events
       .pipe(
@@ -60,6 +77,9 @@ export class NavigationComponent implements OnDestroy {
       )
       .subscribe(() => {
         this.currentRoute.set(this.router.url);
+        if (this.isMobileMenuOpen()) {
+          this.closeMobileMenu();
+        }
       });
   }
 
@@ -76,11 +96,25 @@ export class NavigationComponent implements OnDestroy {
   }
 
   toggleMobileMenu(): void {
-    this.isMobileMenuOpen.update((open) => !open);
+    if (this.isMobileMenuOpen()) {
+      this.closeMobileMenu();
+    } else {
+      this.openMobileMenu();
+    }
+  }
+
+  openMobileMenu(): void {
+    if (this.isMobileMenuOpen()) {
+      return;
+    }
+    this.isMobileMenuOpen.set(true);
     this.updateBodyScroll();
   }
 
   closeMobileMenu(): void {
+    if (!this.isMobileMenuOpen()) {
+      return;
+    }
     this.isMobileMenuOpen.set(false);
     this.updateBodyScroll();
   }
@@ -92,18 +126,32 @@ export class NavigationComponent implements OnDestroy {
 
     const body = document.body;
     if (this.isMobileMenuOpen()) {
+      const scrollY = window.scrollY;
       body.style.overflow = 'hidden';
       body.style.position = 'fixed';
       body.style.width = '100%';
-      body.style.top = `-${window.scrollY}px`;
+      body.style.top = `-${scrollY}px`;
+      body.setAttribute('data-scroll-y', scrollY.toString());
     } else {
-      const scrollY = body.style.top;
-      body.style.overflow = '';
-      body.style.position = '';
-      body.style.width = '';
-      body.style.top = '';
-      if (scrollY) {
-        window.scrollTo(0, parseInt(scrollY || '0') * -1);
+      this.restoreBodyScroll();
+    }
+  }
+
+  private restoreBodyScroll(): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+    const body = document.body;
+    const scrollY = body.getAttribute('data-scroll-y');
+    body.style.overflow = '';
+    body.style.position = '';
+    body.style.width = '';
+    body.style.top = '';
+    body.removeAttribute('data-scroll-y');
+    if (scrollY) {
+      const scrollPosition = parseInt(scrollY, 10);
+      if (!isNaN(scrollPosition) && scrollPosition >= 0) {
+        window.scrollTo(0, scrollPosition);
       }
     }
   }
@@ -111,13 +159,9 @@ export class NavigationComponent implements OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-
     if (isPlatformBrowser(this.platformId) && this.isMobileMenuOpen()) {
-      const body = document.body;
-      body.style.overflow = '';
-      body.style.position = '';
-      body.style.width = '';
-      body.style.top = '';
+      this.isMobileMenuOpen.set(false);
+      this.restoreBodyScroll();
     }
   }
 
