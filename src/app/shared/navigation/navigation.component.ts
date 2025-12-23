@@ -42,6 +42,13 @@ export class NavigationComponent implements OnDestroy {
     }
   }
 
+  onBackdropKeyDown(event: KeyboardEvent): void {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      this.closeMobileMenu();
+    }
+  }
+
   @HostListener('window:scroll')
   onWindowScroll(): void {
     if (!isPlatformBrowser(this.platformId)) {

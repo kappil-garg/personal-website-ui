@@ -68,7 +68,11 @@
 @if (isMobileMenuOpen()) {
   <div 
     class="mobile-nav-menu-backdrop"
+    tabindex="0"
+    role="button"
+    aria-label="Close mobile menu"
     (click)="closeMobileMenu()"
+    (keydown)="onBackdropKeyDown($event)"
   ></div>
 }
 <div 

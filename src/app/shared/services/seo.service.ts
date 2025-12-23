@@ -301,9 +301,6 @@ export class SeoService {
    * Handles relative paths, absolute paths, and already absolute URLs.
    */
   private normalizeImageUrl(imageUrl: string): string {
-    if (!imageUrl) {
-      return this.defaultImage;
-    }
     if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
       return imageUrl;
     }

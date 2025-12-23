@@ -13,6 +13,7 @@ import { ErrorStateComponent } from '../../shared/components/error-state/error-s
 import { SeoService } from '../../shared/services/seo.service';
 import { PortfolioService } from '../../services/portfolio.service';
 import { BlogDetailResult } from '../../models/blog.interface';
+import { EnvironmentService } from '../../shared/services/environment.service';
 
 @Component({
   selector: 'app-blog-detail',
@@ -39,6 +40,7 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
   private blogService = inject(BlogService);
   private portfolioService = inject(PortfolioService);
   private categoryConfigService = inject(CategoryConfigService);
+  private environmentService = inject(EnvironmentService);
 
   private apiErrorSignal = signal<boolean>(false);
   private currentBlogSignal = signal<Blog | null>(null);
@@ -78,9 +80,7 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
       if (!result) {
         this.apiErrorSignal.set(true);
         this.currentBlogSignal.set(null);
-        if (isPlatformBrowser(this.platformId)) {
-          console.error('[BlogDetail] Route resolver data missing - routing configuration issue');
-        }
+        this.environmentService.warn('BlogDetail: Route resolver data missing - routing configuration issue');
         return;
       }
       if (result.blog) {
@@ -96,6 +96,9 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
         this.apiErrorSignal.set(true);
         this.currentBlogSignal.set(null);
         this.scrollToTop();
+      } else {
+        this.environmentService.warn('BlogDetail: Unexpected resolver state - blog and error both null');
+        this.router.navigate(['/blogs']);
       }
     });
   }
