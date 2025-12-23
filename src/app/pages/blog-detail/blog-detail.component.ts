@@ -74,22 +74,28 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.route.data.pipe(takeUntil(this.destroy$)).subscribe((data) => {
-      const result = data['blog'] as BlogDetailResult;
-      if (result?.blog) {
+      const result = data['blog'] as BlogDetailResult | undefined;
+      if (!result) {
+        this.apiErrorSignal.set(true);
+        this.currentBlogSignal.set(null);
+        if (isPlatformBrowser(this.platformId)) {
+          console.error('[BlogDetail] Route resolver data missing - routing configuration issue');
+        }
+        return;
+      }
+      if (result.blog) {
         this.currentBlogSignal.set(result.blog);
         this.apiErrorSignal.set(false);
         if (isPlatformBrowser(this.platformId)) {
           this.incrementViewCount(result.blog.id);
         }
         this.scrollToTop();
-      } else if (result?.error === 'not_found') {
+      } else if (result.error === 'not_found') {
         this.router.navigate(['/blogs']);
-      } else if (result?.error === 'api_error') {
+      } else if (result.error === 'api_error') {
         this.apiErrorSignal.set(true);
         this.currentBlogSignal.set(null);
         this.scrollToTop();
-      } else {
-        this.router.navigate(['/blogs']);
       }
     });
   }
