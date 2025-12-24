@@ -166,10 +166,12 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
           } else if (result.error === 'not_found') {
             this.router.navigate(['/blogs']);
           } else {
+            this.seoService.setBlogSlugFallbackMetaTags(slug);
             this.apiErrorSignal.set(true);
           }
         },
         error: () => {
+          this.seoService.setBlogSlugFallbackMetaTags(slug);
           this.apiErrorSignal.set(true);
         },
       });
