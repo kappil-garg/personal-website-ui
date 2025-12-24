@@ -17,15 +17,17 @@ export const blogDetailResolver: ResolveFn<BlogDetailResult> = (route) => {
   const blogService = inject(BlogService);
 
   return blogService.getBlogBySlug(slug).pipe(
-    map((blog) => {
-      if (blog) {
-        seoService.setBlogPostMetaTags(blog);
-        blogService.addBlogToList(blog);
-        return { blog, error: null };
+    map((result) => {
+      if (result.blog) {
+        seoService.setBlogPostMetaTags(result.blog);
+        blogService.addBlogToList(result.blog);
+        return { blog: result.blog, error: null };
       }
-      return { blog: null, error: 'not_found' as const };
+      seoService.setBlogSlugFallbackMetaTags(slug);
+      return result;
     }),
     catchError(() => {
+      seoService.setBlogSlugFallbackMetaTags(slug);
       return of({ blog: null, error: 'api_error' as const });
     }),
   );

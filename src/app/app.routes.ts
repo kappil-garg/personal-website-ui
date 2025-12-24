@@ -47,7 +47,6 @@ export const routes: Routes = [
   {
     path: 'blogs/:slug',
     loadComponent: () => import('./pages/blog-detail/blog-detail.component').then(m => m.BlogDetailComponent),
-    title: 'Blog Post - Kapil Garg',
     resolve: { blog: blogDetailResolver }
   },
   {

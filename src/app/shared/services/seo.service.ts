@@ -83,6 +83,47 @@ export class SeoService {
 
   }
 
+  /**
+   * Sets fallback meta tags when a blog post cannot be loaded.
+   * This ensures social platforms show something useful instead of default home page tags.
+   */
+  setBlogSlugFallbackMetaTags(slug: string): void {
+    const readableTitle = this.slugToReadableTitle(slug);
+    const title = `${readableTitle} - Kapil Garg`;
+    const url = `${this.baseUrl}/blogs/${slug}`;
+    const description = `Read "${readableTitle}" by Kapil Garg - Java Full Stack Developer sharing insights on technology, career, and software development.`;
+    this.title.setTitle(title);
+    this.updateOrCreateMetaTag('name', 'description', description);
+    this.updateOrCreateMetaTag('name', 'author', this.author);
+    this.updateOrCreateMetaTag('property', 'og:type', 'article');
+    this.updateOrCreateMetaTag('property', 'og:title', title);
+    this.updateOrCreateMetaTag('property', 'og:description', description);
+    this.updateOrCreateMetaTag('property', 'og:image', this.defaultImage);
+    this.updateOrCreateMetaTag('property', 'og:image:width', '1200');
+    this.updateOrCreateMetaTag('property', 'og:image:height', '630');
+    this.updateOrCreateMetaTag('property', 'og:image:alt', title);
+    this.updateOrCreateMetaTag('property', 'og:url', url);
+    this.updateOrCreateMetaTag('property', 'og:site_name', 'Kapil Garg');
+    this.updateOrCreateMetaTag('property', 'og:locale', 'en_US');
+    this.updateOrCreateMetaTag('name', 'twitter:card', 'summary_large_image');
+    this.updateOrCreateMetaTag('name', 'twitter:title', title);
+    this.updateOrCreateMetaTag('name', 'twitter:description', description);
+    this.updateOrCreateMetaTag('name', 'twitter:image', this.defaultImage);
+    this.updateOrCreateMetaTag('name', 'twitter:site', '@KappilGarg');
+    this.updateOrCreateMetaTag('name', 'twitter:creator', '@KappilGarg');
+    this.updateOrCreateLinkTag('canonical', url);
+  }
+
+  /**
+   * Converts a URL slug to a readable title.
+   */
+  private slugToReadableTitle(slug: string): string {
+    return slug
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+  }
+
   setBlogsListingMetaTags(): void {
     const title = 'Blogs - Kapil Garg';
     const url = `${this.baseUrl}/blogs`;

@@ -154,17 +154,19 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
       .getBlogBySlug(slug)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (blog) => {
-          if (blog) {
-            this.currentBlogSignal.set(blog);
+        next: (result) => {
+          if (result.blog) {
+            this.currentBlogSignal.set(result.blog);
             this.apiErrorSignal.set(false);
-            this.blogService.addBlogToList(blog);
-            this.seoService.setBlogPostMetaTags(blog);
+            this.blogService.addBlogToList(result.blog);
+            this.seoService.setBlogPostMetaTags(result.blog);
             if (isPlatformBrowser(this.platformId)) {
-              this.incrementViewCount(blog.id);
+              this.incrementViewCount(result.blog.id);
             }
-          } else {
+          } else if (result.error === 'not_found') {
             this.router.navigate(['/blogs']);
+          } else {
+            this.apiErrorSignal.set(true);
           }
         },
         error: () => {
