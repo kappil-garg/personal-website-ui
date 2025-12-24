@@ -1,7 +1,7 @@
 import { inject } from '@angular/core';
 import { ResolveFn } from '@angular/router';
 import { of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { BlogDetailResult } from '../../models/blog.interface';
 import { BlogService } from '../../services/blog.service';
 import { SeoService } from '../services/seo.service';
@@ -17,16 +17,14 @@ export const blogDetailResolver: ResolveFn<BlogDetailResult> = (route) => {
   const blogService = inject(BlogService);
 
   return blogService.getBlogBySlug(slug).pipe(
-    map((blog) => {
-      if (blog) {
-        seoService.setBlogPostMetaTags(blog);
-        blogService.addBlogToList(blog);
-        return { blog, error: null };
+    map((result) => {
+      if (result.blog) {
+        seoService.setBlogPostMetaTags(result.blog);
+        blogService.addBlogToList(result.blog);
+        return { blog: result.blog, error: null };
       }
-      return { blog: null, error: 'not_found' as const };
-    }),
-    catchError(() => {
-      return of({ blog: null, error: 'api_error' as const });
+      seoService.setBlogSlugFallbackMetaTags(slug);
+      return result;
     }),
   );
 

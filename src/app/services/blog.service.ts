@@ -1,7 +1,7 @@
 import { Injectable, signal, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, of, catchError, finalize, map, timeout, TimeoutError } from 'rxjs';
-import { Blog, BlogFilters } from '../models/blog.interface';
+import { Blog, BlogFilters, BlogDetailResult } from '../models/blog.interface';
 import { ApiResponse } from '../models/api-response.interface';
 import { APP_CONSTANTS, SortOption, SortOrder } from '../shared/constants/app.constants';
 import { StringUtils } from '../shared/utils/string.utils';
@@ -15,8 +15,8 @@ export class BlogService {
 
   private readonly API_BASE_URL = `${environment.apiUrl}/blogs`;
 
-  private readonly CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
-  private readonly REQUEST_TIMEOUT_MS = 15 * 1000; // 15 seconds timeout
+  private readonly CACHE_TTL_MS = 5 * 60 * 1000;
+  private readonly REQUEST_TIMEOUT_MS = 15 * 1000;
 
   private http = inject(HttpClient);
   private environmentService = inject(EnvironmentService);
@@ -72,17 +72,21 @@ export class BlogService {
     );
   }
 
-  getBlogBySlug(slug: string): Observable<Blog | null> {
+  getBlogBySlug(slug: string): Observable<BlogDetailResult> {
     return this.http.get<ApiResponse<Blog>>(`${this.API_BASE_URL}/published/${slug}`).pipe(
       timeout(this.REQUEST_TIMEOUT_MS),
-      map(response => response.data),
-      catchError(error => {
+      map(response => ({ blog: response.data, error: null }) as BlogDetailResult),
+      catchError((error: HttpErrorResponse | TimeoutError) => {
         if (error instanceof TimeoutError) {
           this.environmentService.warn('Blog detail request timed out after', this.REQUEST_TIMEOUT_MS, 'ms');
-        } else {
-          this.environmentService.warn('Error fetching blog:', error);
+          return of({ blog: null, error: 'api_error' } as BlogDetailResult);
         }
-        return of(null);
+        if (error instanceof HttpErrorResponse && error.status === 404) {
+          this.environmentService.warn('Blog not found:', slug);
+          return of({ blog: null, error: 'not_found' } as BlogDetailResult);
+        }
+        this.environmentService.warn('Error fetching blog:', error);
+        return of({ blog: null, error: 'api_error' } as BlogDetailResult);
       })
     );
   }
