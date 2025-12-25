@@ -106,7 +106,6 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-    this.seoService.setDefaultMetaTags();
   }
 
   private incrementViewCount(blogId: string): void {

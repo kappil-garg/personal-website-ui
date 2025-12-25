@@ -2,7 +2,7 @@ export const environment = {
   production: false,
   apiUrl: 'http://localhost:8080/api',
   appName: 'Personal Website',
-  version: '1.8.2',
+  version: '1.8.3',
   features: {
     enableAnalytics: false,
     enableDebugMode: true,

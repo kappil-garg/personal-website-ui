@@ -19,68 +19,30 @@ export class SeoService {
   private readonly defaultDescription = 'Full Stack Java Developer with 8+ years of experience in enterprise-grade software solutions. Specialized in Spring Boot, Angular, and modern web technologies.';
 
   setBlogPostMetaTags(blog: Blog): void {
-
     const title = `${blog.title} - Kapil Garg`;
     const url = `${this.baseUrl}/blogs/${blog.slug}`;
     const description = blog.excerpt || this.defaultDescription;
-
-    // Prioritize featured image, only fallback to default if truly missing
     const featuredImage = blog.featuredImage?.trim();
-    const image = featuredImage 
-      ? this.normalizeImageUrl(featuredImage)
-      : this.defaultImage;
-    
+    const image = featuredImage ? this.normalizeImageUrl(featuredImage) : this.defaultImage;
     const modifiedTime = blog.updatedAt;
     const publishedTime = blog.publishedAt || blog.createdAt;
-    
-    this.title.setTitle(title);
 
+    this.title.setTitle(title);
     this.updateOrCreateMetaTag('name', 'description', description);
     this.updateOrCreateMetaTag('name', 'author', this.author);
     this.updateOrCreateMetaTag('name', 'keywords', this.generateKeywords(blog));
 
-    this.updateOrCreateMetaTag('property', 'og:type', 'article');
-    this.updateOrCreateMetaTag('property', 'og:title', title);
-    this.updateOrCreateMetaTag('property', 'og:description', description);
-    this.updateOrCreateMetaTag('property', 'og:image', image);
-    this.updateOrCreateMetaTag('property', 'og:image:width', '1200');
-    this.updateOrCreateMetaTag('property', 'og:image:height', '630');
-    this.updateOrCreateMetaTag('property', 'og:image:alt', title);
-    this.updateOrCreateMetaTag('property', 'og:image:type', this.getImageType(image));
-    this.updateOrCreateMetaTag('property', 'og:url', url);
-    this.updateOrCreateMetaTag('property', 'og:site_name', 'Kapil Garg');
-    this.updateOrCreateMetaTag('property', 'og:locale', 'en_US');
-
-    if (publishedTime) {
-      this.updateOrCreateMetaTag(
-        'property',
-        'article:published_time',
-        publishedTime,
-      );
-    }
-
-    if (modifiedTime) {
-      this.updateOrCreateMetaTag(
-        'property',
-        'article:modified_time',
-        modifiedTime,
-      );
-    }
-
-    if (blog.category) {
-      this.updateOrCreateMetaTag('property', 'article:section', blog.category);
-    }
-
-    this.updateOrCreateMetaTag('name', 'twitter:card', 'summary_large_image');
-    this.updateOrCreateMetaTag('name', 'twitter:title', title);
-    this.updateOrCreateMetaTag('name', 'twitter:description', description);
-    this.updateOrCreateMetaTag('name', 'twitter:image', image);
-    this.updateOrCreateMetaTag('name', 'twitter:site', '@KappilGarg');
-    this.updateOrCreateMetaTag('name', 'twitter:creator', '@KappilGarg');
-
-    this.updateOrCreateLinkTag('canonical', url);
-    this.updateOrCreateMetaTag('property', 'article:author', this.author);
-
+    this.setSocialMeta({
+      type: 'article',
+      title,
+      description,
+      url,
+      image,
+      imageAlt: title,
+      publishedTime,
+      modifiedTime,
+      section: blog.category,
+    });
   }
 
   /**
@@ -88,40 +50,24 @@ export class SeoService {
    * This ensures social platforms show something useful instead of default home page tags.
    */
   setBlogSlugFallbackMetaTags(slug: string): void {
-
     const readableTitle = this.slugToReadableTitle(slug);
     const title = `${readableTitle} - Kapil Garg`;
     const url = `${this.baseUrl}/blogs/${slug}`;
     const description = `Read "${readableTitle}" by Kapil Garg - Java Full Stack Developer sharing insights on technology, career, and software development.`;
-
     this.title.setTitle(title);
-
     this.updateOrCreateMetaTag('name', 'description', description);
     this.updateOrCreateMetaTag('name', 'author', this.author);
     this.updateOrCreateMetaTag('name', 'keywords', this.generateFallbackKeywords(readableTitle));
-
-    this.updateOrCreateMetaTag('property', 'og:type', 'article');
-    this.updateOrCreateMetaTag('property', 'og:title', title);
-    this.updateOrCreateMetaTag('property', 'og:description', description);
-    this.updateOrCreateMetaTag('property', 'og:image', this.defaultImage);
-    this.updateOrCreateMetaTag('property', 'og:image:width', '1200');
-    this.updateOrCreateMetaTag('property', 'og:image:height', '630');
-    this.updateOrCreateMetaTag('property', 'og:image:alt', title);
-    this.updateOrCreateMetaTag('property', 'og:image:type', this.getImageType(this.defaultImage));
-    this.updateOrCreateMetaTag('property', 'og:url', url);
-    this.updateOrCreateMetaTag('property', 'og:site_name', 'Kapil Garg');
-    this.updateOrCreateMetaTag('property', 'og:locale', 'en_US');
-
-    this.updateOrCreateMetaTag('name', 'twitter:card', 'summary_large_image');
-    this.updateOrCreateMetaTag('name', 'twitter:title', title);
-    this.updateOrCreateMetaTag('name', 'twitter:description', description);
-    this.updateOrCreateMetaTag('name', 'twitter:image', this.defaultImage);
-    this.updateOrCreateMetaTag('name', 'twitter:site', '@KappilGarg');
-    this.updateOrCreateMetaTag('name', 'twitter:creator', '@KappilGarg');
-
+    this.setSocialMeta({
+      type: 'article',
+      title,
+      description,
+      url,
+      image: this.defaultImage,
+      imageAlt: title,
+      author: this.author,
+    });
     this.updateOrCreateLinkTag('canonical', url);
-    this.updateOrCreateMetaTag('property', 'article:author', this.author);
-    
   }
 
   /**
@@ -140,18 +86,14 @@ export class SeoService {
     const description = 'Read my thoughts, insights, and experiences from my journey in technology, life, and career. Technical tutorials, career advice, and personal stories.';
     this.title.setTitle(title);
     this.updateOrCreateMetaTag('name', 'description', description);
-    this.updateOrCreateMetaTag('property', 'og:type', 'website');
-    this.updateOrCreateMetaTag('property', 'og:title', title);
-    this.updateOrCreateMetaTag('property', 'og:description', description);
-    this.updateOrCreateMetaTag('property', 'og:url', url);
-    this.updateOrCreateMetaTag('property', 'og:image', this.defaultImage);
-    this.updateOrCreateMetaTag('property', 'og:image:width', '1200');
-    this.updateOrCreateMetaTag('property', 'og:image:height', '630');
-    this.updateOrCreateMetaTag('property', 'og:image:alt', title);
-    this.updateOrCreateMetaTag('name', 'twitter:card', 'summary_large_image');
-    this.updateOrCreateMetaTag('name', 'twitter:title', title);
-    this.updateOrCreateMetaTag('name', 'twitter:description', description);
-    this.updateOrCreateMetaTag('name', 'twitter:image', this.defaultImage);
+    this.setSocialMeta({
+      type: 'website',
+      title,
+      description,
+      url,
+      image: this.defaultImage,
+      imageAlt: title,
+    });
     this.updateOrCreateLinkTag('canonical', url);
   }
 
@@ -182,18 +124,14 @@ export class SeoService {
     const description = 'A collection of projects I\'ve worked on, showcasing my skills and experience in software development. Explore my portfolio of applications and solutions.';
     this.title.setTitle(title);
     this.updateOrCreateMetaTag('name', 'description', description);
-    this.updateOrCreateMetaTag('property', 'og:type', 'website');
-    this.updateOrCreateMetaTag('property', 'og:title', title);
-    this.updateOrCreateMetaTag('property', 'og:description', description);
-    this.updateOrCreateMetaTag('property', 'og:url', url);
-    this.updateOrCreateMetaTag('property', 'og:image', this.defaultImage);
-    this.updateOrCreateMetaTag('property', 'og:image:width', '1200');
-    this.updateOrCreateMetaTag('property', 'og:image:height', '630');
-    this.updateOrCreateMetaTag('property', 'og:image:alt', title);
-    this.updateOrCreateMetaTag('name', 'twitter:card', 'summary_large_image');
-    this.updateOrCreateMetaTag('name', 'twitter:title', title);
-    this.updateOrCreateMetaTag('name', 'twitter:description', description);
-    this.updateOrCreateMetaTag('name', 'twitter:image', this.defaultImage);
+    this.setSocialMeta({
+      type: 'website',
+      title,
+      description,
+      url,
+      image: this.defaultImage,
+      imageAlt: title,
+    });
     this.updateOrCreateLinkTag('canonical', url);
   }
 
@@ -203,18 +141,14 @@ export class SeoService {
     const description = 'My academic journey and professional degrees. Explore my educational background and qualifications.';
     this.title.setTitle(title);
     this.updateOrCreateMetaTag('name', 'description', description);
-    this.updateOrCreateMetaTag('property', 'og:type', 'website');
-    this.updateOrCreateMetaTag('property', 'og:title', title);
-    this.updateOrCreateMetaTag('property', 'og:description', description);
-    this.updateOrCreateMetaTag('property', 'og:url', url);
-    this.updateOrCreateMetaTag('property', 'og:image', this.defaultImage);
-    this.updateOrCreateMetaTag('property', 'og:image:width', '1200');
-    this.updateOrCreateMetaTag('property', 'og:image:height', '630');
-    this.updateOrCreateMetaTag('property', 'og:image:alt', title);
-    this.updateOrCreateMetaTag('name', 'twitter:card', 'summary_large_image');
-    this.updateOrCreateMetaTag('name', 'twitter:title', title);
-    this.updateOrCreateMetaTag('name', 'twitter:description', description);
-    this.updateOrCreateMetaTag('name', 'twitter:image', this.defaultImage);
+    this.setSocialMeta({
+      type: 'website',
+      title,
+      description,
+      url,
+      image: this.defaultImage,
+      imageAlt: title,
+    });
     this.updateOrCreateLinkTag('canonical', url);
   }
 
@@ -224,18 +158,14 @@ export class SeoService {
     const description = 'Professional certifications and courses I\'ve completed. Explore my continuous learning journey and professional development achievements.';
     this.title.setTitle(title);
     this.updateOrCreateMetaTag('name', 'description', description);
-    this.updateOrCreateMetaTag('property', 'og:type', 'website');
-    this.updateOrCreateMetaTag('property', 'og:title', title);
-    this.updateOrCreateMetaTag('property', 'og:description', description);
-    this.updateOrCreateMetaTag('property', 'og:url', url);
-    this.updateOrCreateMetaTag('property', 'og:image', this.defaultImage);
-    this.updateOrCreateMetaTag('property', 'og:image:width', '1200');
-    this.updateOrCreateMetaTag('property', 'og:image:height', '630');
-    this.updateOrCreateMetaTag('property', 'og:image:alt', title);
-    this.updateOrCreateMetaTag('name', 'twitter:card', 'summary_large_image');
-    this.updateOrCreateMetaTag('name', 'twitter:title', title);
-    this.updateOrCreateMetaTag('name', 'twitter:description', description);
-    this.updateOrCreateMetaTag('name', 'twitter:image', this.defaultImage);
+    this.setSocialMeta({
+      type: 'website',
+      title,
+      description,
+      url,
+      image: this.defaultImage,
+      imageAlt: title,
+    });
     this.updateOrCreateLinkTag('canonical', url);
   }
 
@@ -245,18 +175,14 @@ export class SeoService {
     const description = 'Get in touch with me for collaborations, opportunities, or just to say hello. Send me a message and I\'ll respond as soon as possible.';
     this.title.setTitle(title);
     this.updateOrCreateMetaTag('name', 'description', description);
-    this.updateOrCreateMetaTag('property', 'og:type', 'website');
-    this.updateOrCreateMetaTag('property', 'og:title', title);
-    this.updateOrCreateMetaTag('property', 'og:description', description);
-    this.updateOrCreateMetaTag('property', 'og:url', url);
-    this.updateOrCreateMetaTag('property', 'og:image', this.defaultImage);
-    this.updateOrCreateMetaTag('property', 'og:image:width', '1200');
-    this.updateOrCreateMetaTag('property', 'og:image:height', '630');
-    this.updateOrCreateMetaTag('property', 'og:image:alt', title);
-    this.updateOrCreateMetaTag('name', 'twitter:card', 'summary_large_image');
-    this.updateOrCreateMetaTag('name', 'twitter:title', title);
-    this.updateOrCreateMetaTag('name', 'twitter:description', description);
-    this.updateOrCreateMetaTag('name', 'twitter:image', this.defaultImage);
+    this.setSocialMeta({
+      type: 'website',
+      title,
+      description,
+      url,
+      image: this.defaultImage,
+      imageAlt: title,
+    });
     this.updateOrCreateLinkTag('canonical', url);
   }
 
@@ -266,36 +192,94 @@ export class SeoService {
     const description = 'A comprehensive overview of my technical skills, including programming languages, frameworks, tools, and technologies I work with to build modern applications.';
     this.title.setTitle(title);
     this.updateOrCreateMetaTag('name', 'description', description);
-    this.updateOrCreateMetaTag('property', 'og:type', 'website');
-    this.updateOrCreateMetaTag('property', 'og:title', title);
-    this.updateOrCreateMetaTag('property', 'og:description', description);
-    this.updateOrCreateMetaTag('property', 'og:url', url);
-    this.updateOrCreateMetaTag('property', 'og:image', this.defaultImage);
-    this.updateOrCreateMetaTag('property', 'og:image:width', '1200');
-    this.updateOrCreateMetaTag('property', 'og:image:height', '630');
-    this.updateOrCreateMetaTag('property', 'og:image:alt', title);
-    this.updateOrCreateMetaTag('name', 'twitter:card', 'summary_large_image');
-    this.updateOrCreateMetaTag('name', 'twitter:title', title);
-    this.updateOrCreateMetaTag('name', 'twitter:description', description);
-    this.updateOrCreateMetaTag('name', 'twitter:image', this.defaultImage);
+    this.setSocialMeta({
+      type: 'website',
+      title,
+      description,
+      url,
+      image: this.defaultImage,
+      imageAlt: title,
+    });
     this.updateOrCreateLinkTag('canonical', url);
   }
 
   setDefaultMetaTags(): void {
     this.title.setTitle(this.defaultTitle);
     this.updateOrCreateMetaTag('name', 'description', this.defaultDescription);
-    this.updateOrCreateMetaTag('property', 'og:type', 'website');
-    this.updateOrCreateMetaTag('property', 'og:title', this.defaultTitle);
-    this.updateOrCreateMetaTag('property', 'og:description', this.defaultDescription);
-    this.updateOrCreateMetaTag('property', 'og:url', this.baseUrl);
-    this.updateOrCreateMetaTag('property', 'og:image', this.defaultImage);
+    this.setSocialMeta({
+      type: 'website',
+      title: this.defaultTitle,
+      description: this.defaultDescription,
+      url: this.baseUrl,
+      image: this.defaultImage,
+      imageAlt: this.defaultTitle,
+    });
+  }
+
+  private setSocialMeta(params: {
+    type: 'article' | 'website';
+    title: string;
+    description: string;
+    url: string;
+    image: string;
+    imageAlt: string;
+    publishedTime?: string;
+    modifiedTime?: string;
+    section?: string;
+    author?: string;
+  }): void {
+    const {
+      type,
+      title,
+      description,
+      url,
+      image,
+      imageAlt,
+      publishedTime,
+      modifiedTime,
+      section,
+      author,
+    } = params;
+    // Open Graph
+    this.updateOrCreateMetaTag('property', 'og:type', type);
+    this.updateOrCreateMetaTag('property', 'og:title', title);
+    this.updateOrCreateMetaTag('property', 'og:description', description);
+    this.updateOrCreateMetaTag('property', 'og:image', image);
     this.updateOrCreateMetaTag('property', 'og:image:width', '1200');
     this.updateOrCreateMetaTag('property', 'og:image:height', '630');
-    this.updateOrCreateMetaTag('property', 'og:image:alt', this.defaultTitle);
+    this.updateOrCreateMetaTag('property', 'og:image:alt', imageAlt);
+    this.updateOrCreateMetaTag('property', 'og:image:type', this.getImageType(image));
+    this.updateOrCreateMetaTag('property', 'og:url', url);
+    this.updateOrCreateMetaTag('property', 'og:site_name', 'Kapil Garg');
+    this.updateOrCreateMetaTag('property', 'og:locale', 'en_US');
+    // Article-specific (optional)
+    if (type === 'article') {
+      if (publishedTime) {
+        this.updateOrCreateMetaTag('property', 'article:published_time', publishedTime);
+      }
+      if (modifiedTime) {
+        this.updateOrCreateMetaTag('property', 'article:modified_time', modifiedTime);
+      }
+      if (section) {
+        this.updateOrCreateMetaTag('property', 'article:section', section);
+      }
+      if (author) {
+        this.updateOrCreateMetaTag('property', 'article:author', author);
+      }
+    }
+    // Twitter (both name and property to override defaults)
     this.updateOrCreateMetaTag('name', 'twitter:card', 'summary_large_image');
-    this.updateOrCreateMetaTag('name', 'twitter:title', this.defaultTitle);
-    this.updateOrCreateMetaTag('name', 'twitter:description', this.defaultDescription);
-    this.updateOrCreateMetaTag('name', 'twitter:image', this.defaultImage);
+    this.updateOrCreateMetaTag('name', 'twitter:title', title);
+    this.updateOrCreateMetaTag('name', 'twitter:description', description);
+    this.updateOrCreateMetaTag('name', 'twitter:image', image);
+    this.updateOrCreateMetaTag('name', 'twitter:site', '@KappilGarg');
+    this.updateOrCreateMetaTag('name', 'twitter:creator', '@KappilGarg');
+    this.updateOrCreateMetaTag('property', 'twitter:card', 'summary_large_image');
+    this.updateOrCreateMetaTag('property', 'twitter:title', title);
+    this.updateOrCreateMetaTag('property', 'twitter:description', description);
+    this.updateOrCreateMetaTag('property', 'twitter:image', image);
+    this.updateOrCreateMetaTag('property', 'twitter:site', '@KappilGarg');
+    this.updateOrCreateMetaTag('property', 'twitter:creator', '@KappilGarg');
   }
 
   private updateOrCreateMetaTag(
