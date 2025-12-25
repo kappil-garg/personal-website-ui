@@ -82,7 +82,6 @@ export class ContactComponent implements OnInit {
               this.contactService.resetFormState();
               this.cdr.markForCheck();
             });
-            this.cdr.markForCheck();
           } else {
             this.cdr.markForCheck();
           }

@@ -43,6 +43,7 @@ export class SeoService {
       modifiedTime,
       section: blog.category,
     });
+    this.updateOrCreateLinkTag('canonical', url);
   }
 
   /**
@@ -267,19 +268,13 @@ export class SeoService {
         this.updateOrCreateMetaTag('property', 'article:author', author);
       }
     }
-    // Twitter (both name and property to override defaults)
+    // Twitter Cards (uses 'name' attribute per Twitter specification)
     this.updateOrCreateMetaTag('name', 'twitter:card', 'summary_large_image');
     this.updateOrCreateMetaTag('name', 'twitter:title', title);
     this.updateOrCreateMetaTag('name', 'twitter:description', description);
     this.updateOrCreateMetaTag('name', 'twitter:image', image);
     this.updateOrCreateMetaTag('name', 'twitter:site', '@KappilGarg');
     this.updateOrCreateMetaTag('name', 'twitter:creator', '@KappilGarg');
-    this.updateOrCreateMetaTag('property', 'twitter:card', 'summary_large_image');
-    this.updateOrCreateMetaTag('property', 'twitter:title', title);
-    this.updateOrCreateMetaTag('property', 'twitter:description', description);
-    this.updateOrCreateMetaTag('property', 'twitter:image', image);
-    this.updateOrCreateMetaTag('property', 'twitter:site', '@KappilGarg');
-    this.updateOrCreateMetaTag('property', 'twitter:creator', '@KappilGarg');
   }
 
   private updateOrCreateMetaTag(
