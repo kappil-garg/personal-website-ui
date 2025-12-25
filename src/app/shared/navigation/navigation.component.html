@@ -66,7 +66,7 @@
 
 <!-- Mobile Navigation Menu -->
 @if (isMobileMenuOpen()) {
-  <div 
+  <div
     class="mobile-nav-menu-backdrop"
     tabindex="0"
     role="button"
@@ -75,8 +75,8 @@
     (keydown)="onBackdropKeyDown($event)"
   ></div>
 }
-<div 
-  class="mobile-nav-menu" 
+<div
+  class="mobile-nav-menu"
   [class.active]="isMobileMenuOpen()"
   (click)="$event.stopPropagation()"
 >

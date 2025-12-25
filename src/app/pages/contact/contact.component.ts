@@ -2,6 +2,7 @@ import { Component, OnInit, computed, inject, ChangeDetectionStrategy, ChangeDet
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { timer } from 'rxjs';
 import { PortfolioService } from '../../services/portfolio.service';
 import { ContactService } from '../../services/contact.service';
 import { SeoService } from '../../shared/services/seo.service';
@@ -64,8 +65,23 @@ export class ContactComponent implements OnInit {
       ).subscribe({
         next: (response) => {
           if (response.success) {
-            this.contactForm.reset();
-            this.cdr.markForCheck();
+            this.contactForm.reset({
+              name: '',
+              email: '',
+              subject: '',
+              message: ''
+            });
+            Object.keys(this.contactForm.controls).forEach(key => {
+              const control = this.contactForm.get(key);
+              control?.markAsUntouched();
+              control?.markAsPristine();
+            });
+            timer(3000).pipe(
+              takeUntilDestroyed(this.destroyRef)
+            ).subscribe(() => {
+              this.contactService.resetFormState();
+              this.cdr.markForCheck();
+            });
           } else {
             this.cdr.markForCheck();
           }

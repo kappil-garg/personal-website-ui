@@ -4,14 +4,15 @@ import { isPlatformServer } from '@angular/common';
 import { environment } from '../../../environments/environment';
 
 /**
- * Interceptor to add API key header for server-side requests (SSR).
- * Only adds the header for requests to the configured API endpoints.
+ * Interceptor to add API key header for SSR requests to admin endpoints only.
+ * Client-side requests don't need API keys as blog endpoints are public.
  */
 export const apiKeyInterceptor: HttpInterceptorFn = (req, next) => {
 
   const platformId = inject(PLATFORM_ID);
+  const isServer = isPlatformServer(platformId);
 
-  if (!isPlatformServer(platformId)) {
+  if (!isServer) {
     return next(req);
   }
 
@@ -31,10 +32,16 @@ export const apiKeyInterceptor: HttpInterceptorFn = (req, next) => {
     return next(req);
   }
 
-  const apiKey =
-    typeof process !== 'undefined'
-      ? process.env?.['API_SERVER_KEY']
-      : undefined;
+  // Only add API key for admin blog endpoints (non-GET requests to /blogs)
+  const isAdminBlogEndpoint = normalizedRequestUrl.includes('/blogs') && req.method !== 'GET';
+
+  if (!isAdminBlogEndpoint) {
+    return next(req);
+  }
+
+  const apiKey = typeof process !== 'undefined'
+    ? (process.env?.['API_SERVER_KEY'] || process.env?.['API_KEY'])
+    : undefined;
 
   if (apiKey) {
     req = req.clone({
