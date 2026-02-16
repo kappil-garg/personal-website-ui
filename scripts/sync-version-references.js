@@ -1,6 +1,8 @@
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 
+const SEMVER_REGEX = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/;
+
 function updateAllVersions() {
     try {
         const packageJsonPath = join(process.cwd(), 'package.json');
@@ -8,6 +10,9 @@ function updateAllVersions() {
         const version = packageJson.version;
         if (!version || typeof version !== 'string') {
             throw new Error('package.json version is missing or invalid');
+        }
+        if (!SEMVER_REGEX.test(version)) {
+            throw new Error(`package.json version '${version}' is not valid semver`);
         }
         console.log(`🔄 Syncing UI version references to ${version}`);
         const files = [
@@ -36,12 +41,12 @@ function updateVersionProperty(filePath, version) {
         return 0;
     }
     const content = readFileSync(fullPath, 'utf8');
-    const versionRegex = /version:\s*['"`][^'"`]*['"`]/;
+    const versionRegex = /version:\s*(['"`])[^'"`]*\1/;
     if (!versionRegex.test(content)) {
         console.log(`⏭️ Skipped ${filePath} (no 'version' property found)`);
         return 0;
     }
-    const updatedContent = content.replace(versionRegex, `version: '${version}'`);
+    const updatedContent = content.replace(versionRegex, (_match, quote) => `version: ${quote}${version}${quote}`);
     if (updatedContent === content) {
         console.log(`✓ ${filePath} already up to date`);
         return 0;

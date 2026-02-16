@@ -12,19 +12,28 @@ export class ErrorInterceptor implements HttpInterceptor {
 
   constructor(private environmentService: EnvironmentService) {}
 
+  private isClientSideError(error: HttpErrorResponse): boolean {
+    const errorEventConstructor = (globalThis as { ErrorEvent?: new (...args: never[]) => unknown }).ErrorEvent;
+    return !!errorEventConstructor && error.error instanceof errorEventConstructor;
+  }
+
+  private getClientErrorMessage(error: HttpErrorResponse): string {
+    if (typeof error.error !== 'object' || error.error === null || !('message' in error.error)) {
+      return 'Unknown client error';
+    }
+    const message = String((error.error as { message?: unknown }).message ?? '').trim();
+    return message.length > 0 ? message : 'Unknown client error';
+  }
+
   intercept(req: HttpRequestType, next: HttpHandler): Observable<HttpEventType> {
     return next.handle(req).pipe(
       catchError((error: HttpErrorResponse) => {
         let errorCode;
         let errorMessage;
-        const errorEventConstructor = (globalThis as { ErrorEvent?: new (...args: never[]) => unknown }).ErrorEvent;
-        const isClientSideError = !!errorEventConstructor && error.error instanceof errorEventConstructor;
+        const isClientSideError = this.isClientSideError(error);
         // Handle different types of HTTP errors
         if (isClientSideError) {
-          const clientErrorMessage =
-            typeof error.error === 'object' && error.error !== null && 'message' in error.error
-              ? String((error.error as { message?: unknown }).message ?? 'Unknown client error')
-              : 'Unknown client error';
+          const clientErrorMessage = this.getClientErrorMessage(error);
           // Client-side error
           errorMessage = `Client Error: ${clientErrorMessage}`;
           errorCode = 'CLIENT_ERROR';

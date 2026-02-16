@@ -17,6 +17,7 @@
     "format": "prettier --write \"src/**/*.{css,scss,html}\"",
     "format:check": "prettier --check \"src/**/*.{css,scss,html}\"",
     "format:fix": "prettier --write \"**/*.{css,scss,html}\"",
+    "sync:version": "node scripts/sync-version-references.js",
     "code-quality": "npm run lint && npm run format:check"
   },
   "overrides": {

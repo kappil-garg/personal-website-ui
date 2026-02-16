@@ -16,6 +16,7 @@ export const appConfig: ApplicationConfig = {
     provideClientHydration(withEventReplay()),
     provideHttpClient(
       withFetch(),
+      // Functional interceptors run first (API key injection), then DI interceptors (global error handling).
       withInterceptors([apiKeyInterceptor]),
       withInterceptorsFromDi()
     ),
