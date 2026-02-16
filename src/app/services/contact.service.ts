@@ -26,6 +26,16 @@ export class ContactService {
   success = this.successSignal.asReadonly();
   loading = this.loadingSignal.asReadonly();
 
+  private extractSuccessMessage(response: ApiResponse<ContactResponse>): string {
+    if (response.data && typeof response.data === 'object' && typeof response.data.message === 'string') {
+      return response.data.message;
+    }
+    if (typeof response.message === 'string' && response.message.trim().length > 0) {
+      return response.message;
+    }
+    return 'Message sent successfully!';
+  }
+
   submitContactForm(formData: ContactForm): Observable<ContactResponse> {
     this.loadingSignal.set(true);
     this.errorSignal.set(null);
@@ -35,7 +45,10 @@ export class ContactService {
       map(response => {
         this.successSignal.set(true);
         this.errorSignal.set(null);
-        return response.data || { success: true, message: 'Message sent successfully!' };
+        return {
+          success: true,
+          message: this.extractSuccessMessage(response)
+        };
       }),
       catchError(error => {
         if (error instanceof TimeoutError) {
