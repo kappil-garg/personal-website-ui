@@ -17,10 +17,16 @@ export class ErrorInterceptor implements HttpInterceptor {
       catchError((error: HttpErrorResponse) => {
         let errorCode;
         let errorMessage;
+        const errorEventConstructor = (globalThis as { ErrorEvent?: new (...args: never[]) => unknown }).ErrorEvent;
+        const isClientSideError = !!errorEventConstructor && error.error instanceof errorEventConstructor;
         // Handle different types of HTTP errors
-        if (error.error instanceof ErrorEvent) {
+        if (isClientSideError) {
+          const clientErrorMessage =
+            typeof error.error === 'object' && error.error !== null && 'message' in error.error
+              ? String((error.error as { message?: unknown }).message ?? 'Unknown client error')
+              : 'Unknown client error';
           // Client-side error
-          errorMessage = `Client Error: ${error.error.message}`;
+          errorMessage = `Client Error: ${clientErrorMessage}`;
           errorCode = 'CLIENT_ERROR';
         } else {
           // Server-side error

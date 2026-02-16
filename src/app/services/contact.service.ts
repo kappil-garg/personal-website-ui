@@ -35,7 +35,10 @@ export class ContactService {
       map(response => {
         this.successSignal.set(true);
         this.errorSignal.set(null);
-        return response.data || { success: true, message: 'Message sent successfully!' };
+        return {
+          success: true,
+          message: response.data?.message || response.message || 'Message sent successfully!'
+        };
       }),
       catchError(error => {
         if (error instanceof TimeoutError) {

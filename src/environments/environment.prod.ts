@@ -2,7 +2,7 @@ export const environment = {
   production: true,
   apiUrl: 'https://api.kappilgarg.dev/api',
   appName: 'Personal Website',
-  version: '1.8.4',
+  version: '1.8.5',
   features: {
     enableAnalytics: true,
     enableDebugMode: false,
