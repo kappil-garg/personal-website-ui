@@ -2,7 +2,7 @@ import { Component, OnInit, signal, computed, ChangeDetectionStrategy, inject, O
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, Observable, map } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { marked } from 'marked';
 import { BlogService } from '../../services/blog.service';
@@ -250,7 +250,6 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
     this.chatheadOpen.set(false);
   }
 
-
   submitAskQuestion(): void {
     const slug = this.route.snapshot.paramMap.get('slug');
     const question = this.askQuestionInput().trim();
@@ -258,23 +257,26 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
     this.askErrorSignal.set(null);
     this.askAnswerSignal.set(null);
     this.askLoadingSignal.set(true);
-    this.blogService
-      .askAboutBlog(slug, question)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (response) => {
-          this.askLoadingSignal.set(false);
-          if (response?.answer) {
-            this.askAnswerSignal.set(response.answer);
-          } else {
-            this.askErrorSignal.set('Could not get an answer. Please try again.');
-          }
-        },
-        error: () => {
-          this.askLoadingSignal.set(false);
-          this.askErrorSignal.set('Something went wrong. Please try again.');
-        },
-      });
+    const supportsSse = typeof window !== 'undefined' && typeof (window as any).EventSource !== 'undefined';
+    const ask$: Observable<string | null> = supportsSse
+      ? this.blogService.askAboutBlogStream(slug, question)
+      : this.blogService.askAboutBlog(slug, question).pipe(
+          map(response => response?.answer ?? null),
+        );
+    ask$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (answer: string | null) => {
+        this.askLoadingSignal.set(false);
+        if (answer && answer.length > 0) {
+          this.askAnswerSignal.set(answer);
+        } else {
+          this.askErrorSignal.set('Could not get an answer. Please try again.');
+        }
+      },
+      error: () => {
+        this.askLoadingSignal.set(false);
+        this.askErrorSignal.set('Something went wrong. Please try again.');
+      },
+    });
   }
 
   setAskQuestionInput(value: string): void {

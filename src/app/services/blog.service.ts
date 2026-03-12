@@ -109,6 +109,39 @@ export class BlogService {
       );
   }
 
+  askAboutBlogStream(slug: string, question: string): Observable<string> {
+    return new Observable<string>(observer => {
+      if (typeof window === 'undefined' || typeof (window as any).EventSource === 'undefined') {
+        observer.error(new Error('Streaming not supported in this environment'));
+        return;
+      }
+      const url = `${this.API_BASE_URL}/published/${encodeURIComponent(
+        slug,
+      )}/ask/stream?question=${encodeURIComponent(question)}`;
+      const eventSource = new EventSource(url);
+      let accumulated = '';
+      let hasReceivedData = false;
+      eventSource.onmessage = event => {
+        accumulated += event.data;
+        hasReceivedData = true;
+        observer.next(accumulated);
+      };
+      eventSource.onerror = err => {
+        if (hasReceivedData) {
+          eventSource.close();
+          observer.complete();
+        } else {
+          this.environmentService.warn('Error in blog ask stream:', err);
+          eventSource.close();
+          observer.error(err);
+        }
+      };
+      return () => {
+        eventSource.close();
+      };
+    });
+  }
+
   incrementViewCount(blogId: string): Observable<Blog | null> {
     return this.http.post<ApiResponse<Blog>>(`${this.API_BASE_URL}/${blogId}/view`, {}).pipe(
       map(response => {
