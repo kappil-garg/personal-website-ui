@@ -18,6 +18,7 @@ export class BlogService {
   private readonly CACHE_TTL_MS = 5 * 60 * 1000;
   private readonly REQUEST_TIMEOUT_MS = 15 * 1000;
   private readonly ASK_TIMEOUT_MS = 45 * 1000;
+  private readonly ASK_STREAM_FIRST_CHUNK_TIMEOUT_MS = 20 * 1000;
 
   private http = inject(HttpClient);
   private environmentService = inject(EnvironmentService);
@@ -111,7 +112,7 @@ export class BlogService {
 
   askAboutBlogStream(slug: string, question: string): Observable<string> {
     return new Observable<string>(observer => {
-      if (typeof window === 'undefined' || typeof (window as any).EventSource === 'undefined') {
+      if (typeof window === 'undefined' || !('EventSource' in window)) {
         observer.error(new Error('Streaming not supported in this environment'));
         return;
       }
@@ -121,22 +122,51 @@ export class BlogService {
       const eventSource = new EventSource(url);
       let accumulated = '';
       let hasReceivedData = false;
+      const firstChunkTimeout = window.setTimeout(() => {
+        if (!hasReceivedData) {
+          this.environmentService.warn(
+            'Blog ask stream timed out waiting for first chunk after',
+            this.ASK_STREAM_FIRST_CHUNK_TIMEOUT_MS,
+            'ms',
+          );
+          eventSource.close();
+          observer.error(new Error('Stream timed out waiting for first chunk'));
+        }
+      }, this.ASK_STREAM_FIRST_CHUNK_TIMEOUT_MS);
       eventSource.onmessage = event => {
+        if (!hasReceivedData) {
+          window.clearTimeout(firstChunkTimeout);
+        }
         accumulated += event.data;
         hasReceivedData = true;
         observer.next(accumulated);
       };
       eventSource.onerror = err => {
+        window.clearTimeout(firstChunkTimeout);
+        // Distinguish normal close from actual errors using readyState.
+        if (eventSource.readyState === EventSource.CLOSED) {
+          eventSource.close();
+          if (hasReceivedData) {
+            // Server has closed the stream after sending data: treat as normal completion.
+            observer.complete();
+          } else {
+            // Closed without ever sending data – treat as an error for the caller.
+            this.environmentService.warn('Blog ask stream closed before any data was received');
+            observer.error(new Error('Stream closed before any data was received.'));
+          }
+          return;
+        }
+        // Any other error (including mid-stream failures) should be surfaced.
+        this.environmentService.warn('Error in blog ask stream:', err);
+        eventSource.close();
         if (hasReceivedData) {
-          eventSource.close();
-          observer.complete();
+          observer.error(new Error('Streaming connection failed before completion.'));
         } else {
-          this.environmentService.warn('Error in blog ask stream:', err);
-          eventSource.close();
-          observer.error(err);
+          observer.error(err instanceof Error ? err : new Error('Stream connection error.'));
         }
       };
       return () => {
+        window.clearTimeout(firstChunkTimeout);
         eventSource.close();
       };
     });

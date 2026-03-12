@@ -248,7 +248,10 @@
           @if (askAnswer()) {
             <div class="ask-answer">
               <h4 class="ask-answer-title">Answer</h4>
-              <div class="ask-answer-text" [innerHTML]="getAskAnswerHtml()"></div>
+              <div
+                class="ask-answer-text"
+                [innerHTML]="getAskAnswerHtml()"
+              ></div>
             </div>
           }
         </div>

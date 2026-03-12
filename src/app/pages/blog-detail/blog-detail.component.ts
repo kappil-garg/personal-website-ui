@@ -2,7 +2,7 @@ import { Component, OnInit, signal, computed, ChangeDetectionStrategy, inject, O
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { Subject, takeUntil, Observable, map } from 'rxjs';
+import { Subject, takeUntil, Observable, map, Subscription, catchError, finalize } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { marked } from 'marked';
 import { BlogService } from '../../services/blog.service';
@@ -56,6 +56,7 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
   private showChathead = signal(false);
 
   private destroy$ = new Subject<void>();
+  private askSubscription: Subscription | null = null;
 
   readonly chatheadIconPath = CHATHEAD_ICON;
   blog = computed(() => this.currentBlogSignal());
@@ -133,6 +134,10 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    if (this.askSubscription) {
+      this.askSubscription.unsubscribe();
+      this.askSubscription = null;
+    }
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -234,13 +239,18 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
   @HostListener('document:keydown.escape')
   onEscape(): void {
     if (this.chatheadOpen()) {
-      this.chatheadOpen.set(false);
+      this.closeChatheadPanel();
     }
   }
 
   toggleChatheadPanel(): void {
     this.chatheadOpen.update(v => !v);
     if (!this.chatheadOpen()) {
+      if (this.askSubscription) {
+        this.askSubscription.unsubscribe();
+        this.askSubscription = null;
+      }
+      this.askLoadingSignal.set(false);
       this.askAnswerSignal.set(null);
       this.askErrorSignal.set(null);
     }
@@ -254,29 +264,49 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
     const slug = this.route.snapshot.paramMap.get('slug');
     const question = this.askQuestionInput().trim();
     if (!slug || !question) return;
+    if (this.askSubscription) {
+      this.askSubscription.unsubscribe();
+      this.askSubscription = null;
+    }
     this.askErrorSignal.set(null);
     this.askAnswerSignal.set(null);
     this.askLoadingSignal.set(true);
-    const supportsSse = typeof window !== 'undefined' && typeof (window as any).EventSource !== 'undefined';
-    const ask$: Observable<string | null> = supportsSse
-      ? this.blogService.askAboutBlogStream(slug, question)
-      : this.blogService.askAboutBlog(slug, question).pipe(
-          map(response => response?.answer ?? null),
-        );
-    ask$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: (answer: string | null) => {
-        this.askLoadingSignal.set(false);
-        if (answer && answer.length > 0) {
-          this.askAnswerSignal.set(answer);
-        } else {
-          this.askErrorSignal.set('Could not get an answer. Please try again.');
-        }
-      },
-      error: () => {
-        this.askLoadingSignal.set(false);
-        this.askErrorSignal.set('Something went wrong. Please try again.');
-      },
-    });
+    const supportsSse = typeof window !== 'undefined' && 'EventSource' in window;
+    let ask$: Observable<string | null>;
+    if (supportsSse) {
+      const stream$ = this.blogService.askAboutBlogStream(slug, question);
+      ask$ = stream$.pipe(
+        catchError(() =>
+          this.blogService.askAboutBlog(slug, question).pipe(
+            map(response => response?.answer ?? null),
+          ),
+        ),
+      );
+    } else {
+      ask$ = this.blogService.askAboutBlog(slug, question).pipe(
+        map(response => response?.answer ?? null),
+      );
+    }
+    this.askSubscription = ask$
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => {
+          this.askLoadingSignal.set(false);
+          this.askSubscription = null;
+        }),
+      )
+      .subscribe({
+        next: (answer: string | null) => {
+          if (answer && answer.length > 0) {
+            this.askAnswerSignal.set(answer);
+          } else {
+            this.askErrorSignal.set('Could not get an answer. Please try again.');
+          }
+        },
+        error: () => {
+          this.askErrorSignal.set('Something went wrong. Please try again.');
+        },
+      });
   }
 
   setAskQuestionInput(value: string): void {
