@@ -139,15 +139,36 @@
             <label for="message" class="form-label">
               Message <span class="required">*</span>
             </label>
-            <textarea
-              id="message"
-              formControlName="message"
-              class="form-textarea"
-              [class.invalid]="isFieldInvalid('message')"
-              placeholder="Your message here..."
-              rows="6"
-              aria-describedby="message-error"
-            ></textarea>
+            <div class="textarea-wrapper">
+              <textarea
+                id="message"
+                formControlName="message"
+                class="form-textarea"
+                [class.invalid]="isFieldInvalid('message')"
+                placeholder="Your message here..."
+                rows="6"
+                aria-describedby="message-error"
+              ></textarea>
+              <button
+                type="button"
+                class="improve-message-icon-btn"
+                [disabled]="
+                  polishLoading() ||
+                  loading() ||
+                  !contactForm.get('message')?.value?.trim() ||
+                  contactForm.get('message')?.value?.trim().length < 10
+                "
+                (click)="improveMessage()"
+                [title]="polishLoading() ? 'Improving...' : 'Improve message with AI'"
+                aria-label="Improve message with AI"
+              >
+                @if (polishLoading()) {
+                  <i class="fas fa-spinner fa-spin" aria-hidden="true"></i>
+                } @else {
+                  <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
+                }
+              </button>
+            </div>
             @if (getFieldError("message")) {
               <span class="error-message" id="message-error" role="alert">
                 {{ getFieldError("message") }}

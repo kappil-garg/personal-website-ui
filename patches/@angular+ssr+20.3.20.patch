@@ -1,0 +1,13 @@
+diff --git a/node_modules/@angular/ssr/fesm2022/ssr.mjs b/node_modules/@angular/ssr/fesm2022/ssr.mjs
+index 0c5b5b4..a379acc 100644
+--- a/node_modules/@angular/ssr/fesm2022/ssr.mjs
++++ b/node_modules/@angular/ssr/fesm2022/ssr.mjs
+@@ -2552,7 +2552,7 @@ class AngularAppEngine {
+      * @param options Options for the Angular server application engine.
+      */
+     constructor(options) {
+-        this.allowedHosts = new Set([...(options?.allowedHosts ?? []), ...this.manifest.allowedHosts]);
++        this.allowedHosts = new Set([...(options?.allowedHosts ?? []), ...(Array.isArray(this.manifest.allowedHosts) ? this.manifest.allowedHosts : [])]);
+     }
+     /**
+      * Handles an incoming HTTP request by serving prerendered content, performing server-side rendering,

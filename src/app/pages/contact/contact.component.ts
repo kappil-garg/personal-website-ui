@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, inject, ChangeDetectionStrategy, ChangeDetectorRef, DestroyRef } from '@angular/core';
+import { Component, OnInit, computed, inject, signal, ChangeDetectionStrategy, ChangeDetectorRef, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -34,6 +34,8 @@ export class ContactComponent implements OnInit {
   success = computed(() => this.contactService.success());
   loading = computed(() => this.contactService.loading());
   personalInfo = computed(() => this.portfolioService.personalInfo());
+
+  polishLoading = signal(false);
 
   constructor() {
     this.contactForm = this.fb.group({
@@ -139,6 +141,32 @@ export class ContactComponent implements OnInit {
   isFieldInvalid(fieldName: string): boolean {
     const field = this.contactForm.get(fieldName);
     return !!(field && field.invalid && field.touched);
+  }
+
+  improveMessage(): void {
+    const messageControl = this.contactForm.get('message');
+    const value = messageControl?.value as string;
+    if (!value || value.trim().length < 10) {
+      return;
+    }
+    this.polishLoading.set(true);
+    this.contactService
+      .polishMessage(value)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          this.polishLoading.set(false);
+          if (response?.suggestedMessage) {
+            this.contactForm.patchValue({ message: response.suggestedMessage });
+            messageControl?.markAsDirty();
+          }
+          this.cdr.markForCheck();
+        },
+        error: () => {
+          this.polishLoading.set(false);
+          this.cdr.markForCheck();
+        },
+      });
   }
 
 }
