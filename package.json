@@ -57,6 +57,7 @@
     "@angular/platform-server": "^20.3.17",
     "@angular/router": "^20.3.17",
     "@angular/ssr": "^20.3.20",
+    "patch-package": "^8.0.0",
     "dompurify": "^3.3.0",
     "express": "^5.1.0",
     "marked": "^17.0.4",
@@ -91,7 +92,6 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "patch-package": "^8.0.0",
     "typescript": "~5.8.2",
     "webpack-bundle-analyzer": "^4.10.2"
   }

@@ -5,9 +5,25 @@ import { join } from 'node:path';
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();
-const angularApp = new AngularNodeAppEngine({
-  allowedHosts: ['localhost', '127.0.0.1'],
-});
+
+const defaultAllowedHosts = ['localhost', '127.0.0.1'];
+const rawAllowedHosts = process.env['SSR_ALLOWED_HOSTS'];
+
+let allowedHosts: string[] | undefined = defaultAllowedHosts;
+
+if (rawAllowedHosts && rawAllowedHosts.trim().length > 0) {
+  if (rawAllowedHosts.trim() === '*') {
+    allowedHosts = undefined;
+  } else {
+    const parsed = rawAllowedHosts
+      .split(',')
+      .map((host) => host.trim())
+      .filter((host) => host.length > 0);
+    allowedHosts = parsed.length > 0 ? parsed : undefined;
+  }
+}
+
+const angularApp = new AngularNodeAppEngine({ allowedHosts });
 
 /**
  * Serve static files from browser directory.

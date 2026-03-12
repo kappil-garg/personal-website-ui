@@ -185,7 +185,7 @@
       (click)="toggleChatheadPanel()"
       [attr.aria-expanded]="chatheadOpenReadonly()"
       aria-label="Ask a question about this post"
-      aria-controls="chathead-panel"
+      [attr.aria-controls]="chatheadOpenReadonly() ? 'chathead-panel' : null"
     >
       <img
         [src]="chatheadIconPath"
