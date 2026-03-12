@@ -1,7 +1,7 @@
 import { Injectable, signal, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, of, catchError, finalize, map, timeout, TimeoutError } from 'rxjs';
-import { Blog, BlogFilters, BlogDetailResult } from '../models/blog.interface';
+import { Blog, BlogFilters, BlogDetailResult, BlogAskResponse } from '../models/blog.interface';
 import { ApiResponse } from '../models/api-response.interface';
 import { APP_CONSTANTS, SortOption, SortOrder } from '../shared/constants/app.constants';
 import { StringUtils } from '../shared/utils/string.utils';
@@ -17,6 +17,7 @@ export class BlogService {
 
   private readonly CACHE_TTL_MS = 5 * 60 * 1000;
   private readonly REQUEST_TIMEOUT_MS = 15 * 1000;
+  private readonly ASK_TIMEOUT_MS = 45 * 1000;
 
   private http = inject(HttpClient);
   private environmentService = inject(EnvironmentService);
@@ -89,6 +90,23 @@ export class BlogService {
         return of({ blog: null, error: 'api_error' } as BlogDetailResult);
       })
     );
+  }
+
+  askAboutBlog(slug: string, question: string): Observable<BlogAskResponse | null> {
+    return this.http
+      .post<ApiResponse<BlogAskResponse>>(`${this.API_BASE_URL}/published/${slug}/ask`, { question })
+      .pipe(
+        timeout(this.ASK_TIMEOUT_MS),
+        map(response => response.data ?? null),
+        catchError(err => {
+          if (err instanceof TimeoutError) {
+            this.environmentService.warn('Blog ask request timed out after', this.ASK_TIMEOUT_MS, 'ms');
+          } else {
+            this.environmentService.warn('Error asking about blog:', err);
+          }
+          return of(null);
+        })
+      );
   }
 
   incrementViewCount(blogId: string): Observable<Blog | null> {

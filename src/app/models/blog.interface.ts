@@ -38,3 +38,11 @@ export interface BlogDetailResult {
   blog: Blog | null;
   error: 'not_found' | 'api_error' | null;
 }
+
+export interface BlogAskRequest {
+  question: string;
+}
+
+export interface BlogAskResponse {
+  answer: string;
+}

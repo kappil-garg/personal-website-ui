@@ -1,9 +1,10 @@
-import { Component, OnInit, signal, computed, ChangeDetectionStrategy, inject, OnDestroy, DestroyRef, SecurityContext, PLATFORM_ID } from '@angular/core';
+import { Component, OnInit, signal, computed, ChangeDetectionStrategy, inject, OnDestroy, DestroyRef, SecurityContext, PLATFORM_ID, HostListener } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Subject, takeUntil } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { marked } from 'marked';
 import { BlogService } from '../../services/blog.service';
 import { CategoryConfigService } from '../../services/category-config.service';
 import { Blog } from '../../models/blog.interface';
@@ -14,6 +15,8 @@ import { SeoService } from '../../shared/services/seo.service';
 import { PortfolioService } from '../../services/portfolio.service';
 import { BlogDetailResult } from '../../models/blog.interface';
 import { EnvironmentService } from '../../shared/services/environment.service';
+
+const CHATHEAD_ICON = 'assets/icons/owl-icon.png';
 
 @Component({
   selector: 'app-blog-detail',
@@ -45,9 +48,23 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
   private apiErrorSignal = signal<boolean>(false);
   private currentBlogSignal = signal<Blog | null>(null);
 
+  private askQuestionInput = signal('');
+  private askAnswerSignal = signal<string | null>(null);
+  private askLoadingSignal = signal(false);
+  private askErrorSignal = signal<string | null>(null);
+  private chatheadOpen = signal(false);
+  private showChathead = signal(false);
+
   private destroy$ = new Subject<void>();
 
+  readonly chatheadIconPath = CHATHEAD_ICON;
   blog = computed(() => this.currentBlogSignal());
+  askQuestionInputReadonly = this.askQuestionInput.asReadonly();
+  askAnswer = this.askAnswerSignal.asReadonly();
+  askLoading = this.askLoadingSignal.asReadonly();
+  askError = this.askErrorSignal.asReadonly();
+  chatheadOpenReadonly = this.chatheadOpen.asReadonly();
+  showChatheadReadonly = this.showChathead.asReadonly();
   hasApiError = computed(() => this.apiErrorSignal());
   authorInfo = computed(() => this.portfolioService.personalInfo());
 
@@ -74,6 +91,17 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
     return sanitized ? this.sanitizer.bypassSecurityTrustHtml(sanitized) : null;
   }
 
+  /**
+   * Converts markdown answer text into sanitized HTML for rendering in the chathead.
+   */
+  getAskAnswerHtml(): SafeHtml | null {
+    const answer = this.askAnswerSignal();
+    if (!answer) return null;
+    const rawHtml = marked.parse(answer);
+    const sanitized = this.sanitizer.sanitize(SecurityContext.HTML, rawHtml);
+    return sanitized ? this.sanitizer.bypassSecurityTrustHtml(sanitized) : null;
+  }
+
   ngOnInit(): void {
     this.route.data.pipe(takeUntil(this.destroy$)).subscribe((data) => {
       const result = data['blog'] as BlogDetailResult | undefined;
@@ -86,6 +114,7 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
       if (result.blog) {
         this.currentBlogSignal.set(result.blog);
         this.apiErrorSignal.set(false);
+        this.showChathead.set(true);
         if (isPlatformBrowser(this.platformId)) {
           this.incrementViewCount(result.blog.id);
         }
@@ -157,6 +186,7 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
           if (result.blog) {
             this.currentBlogSignal.set(result.blog);
             this.apiErrorSignal.set(false);
+            this.showChathead.set(true);
             this.blogService.addBlogToList(result.blog);
             this.seoService.setBlogPostMetaTags(result.blog);
             if (isPlatformBrowser(this.platformId)) {
@@ -199,6 +229,56 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
     if (!isPlatformBrowser(this.platformId) || !window.navigator?.clipboard)
       return;
     window.navigator.clipboard.writeText(window.location.href).catch(() => {});
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    if (this.chatheadOpen()) {
+      this.chatheadOpen.set(false);
+    }
+  }
+
+  toggleChatheadPanel(): void {
+    this.chatheadOpen.update(v => !v);
+    if (!this.chatheadOpen()) {
+      this.askAnswerSignal.set(null);
+      this.askErrorSignal.set(null);
+    }
+  }
+
+  closeChatheadPanel(): void {
+    this.chatheadOpen.set(false);
+  }
+
+
+  submitAskQuestion(): void {
+    const slug = this.route.snapshot.paramMap.get('slug');
+    const question = this.askQuestionInput().trim();
+    if (!slug || !question) return;
+    this.askErrorSignal.set(null);
+    this.askAnswerSignal.set(null);
+    this.askLoadingSignal.set(true);
+    this.blogService
+      .askAboutBlog(slug, question)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          this.askLoadingSignal.set(false);
+          if (response?.answer) {
+            this.askAnswerSignal.set(response.answer);
+          } else {
+            this.askErrorSignal.set('Could not get an answer. Please try again.');
+          }
+        },
+        error: () => {
+          this.askLoadingSignal.set(false);
+          this.askErrorSignal.set('Something went wrong. Please try again.');
+        },
+      });
+  }
+
+  setAskQuestionInput(value: string): void {
+    this.askQuestionInput.set(value);
   }
 
 }

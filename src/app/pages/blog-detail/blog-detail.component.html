@@ -175,3 +175,84 @@
     </div>
   }
 </section>
+
+<!-- Floating chathead outside section so it is not affected by content-visibility on .section (which would pin it to the section instead of the viewport) -->
+@if (blog() && showChatheadReadonly()) {
+  <div class="chathead-wrapper">
+    <button
+      type="button"
+      class="chathead-btn"
+      (click)="toggleChatheadPanel()"
+      [attr.aria-expanded]="chatheadOpenReadonly()"
+      aria-label="Ask a question about this post"
+      [attr.aria-controls]="chatheadOpenReadonly() ? 'chathead-panel' : null"
+    >
+      <img
+        [src]="chatheadIconPath"
+        alt=""
+        width="48"
+        height="48"
+        class="chathead-icon"
+      />
+    </button>
+    @if (chatheadOpenReadonly()) {
+      <div
+        id="chathead-panel"
+        class="chathead-panel"
+        role="dialog"
+        aria-label="Ask about this post"
+      >
+        <div class="chathead-panel-header">
+          <h3 class="chathead-panel-title">Ask about this post</h3>
+          <button
+            type="button"
+            class="chathead-panel-close"
+            (click)="closeChatheadPanel()"
+            aria-label="Close"
+          >
+            ×
+          </button>
+        </div>
+        <div class="chathead-panel-body">
+          <p class="ask-description">
+            Ask a question about this post and get an answer based on its
+            content.
+          </p>
+          <div class="ask-form">
+            <textarea
+              class="ask-input"
+              [value]="askQuestionInputReadonly()"
+              (input)="setAskQuestionInput($any($event.target).value)"
+              placeholder="e.g. What is the main takeaway?"
+              rows="3"
+              [disabled]="askLoading()"
+            ></textarea>
+            <button
+              type="button"
+              class="ask-submit-btn"
+              [disabled]="askLoading() || !askQuestionInputReadonly().trim()"
+              (click)="submitAskQuestion()"
+            >
+              @if (askLoading()) {
+                <i class="fas fa-spinner fa-spin" aria-hidden="true"></i>
+                <span>Getting answer...</span>
+              } @else {
+                <i class="fas fa-paper-plane" aria-hidden="true"></i>
+                <span>Ask</span>
+              }
+            </button>
+          </div>
+          @if (askError()) {
+            <p class="ask-error" role="alert">{{ askError() }}</p>
+          }
+          @if (askAnswer()) {
+            <div class="ask-answer">
+              <h4 class="ask-answer-title">Answer</h4>
+              <div class="ask-answer-text" [innerHTML]="getAskAnswerHtml()"></div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+}

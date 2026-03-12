@@ -236,6 +236,42 @@
   resize: vertical;
   min-height: 120px;
   line-height: var(--line-height-relaxed);
+  padding-bottom: calc(var(--space-4) + 32px);
+}
+
+.textarea-wrapper {
+  position: relative;
+}
+
+.improve-message-icon-btn {
+  position: absolute;
+  bottom: var(--space-3);
+  right: var(--space-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-base);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: color var(--duration-fast) var(--ease-standard);
+
+  &:hover:not(:disabled) {
+    color: var(--color-primary);
+  }
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+
+  i {
+    font-size: var(--font-size-base);
+  }
 }
 
 .error-message {

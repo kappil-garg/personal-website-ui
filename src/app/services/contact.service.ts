@@ -1,7 +1,7 @@
 import { Injectable, signal, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, catchError, finalize, map, timeout, TimeoutError, of } from 'rxjs';
-import { ContactForm, ContactResponse } from '../models/contact.interface';
+import { ContactForm, ContactResponse, ContactPolishRequest, ContactPolishResponse } from '../models/contact.interface';
 import { ApiResponse } from '../models/api-response.interface';
 import { environment } from '../../environments/environment';
 import { EnvironmentService } from '../shared/services/environment.service';
@@ -71,6 +71,27 @@ export class ContactService {
   resetFormState(): void {
     this.errorSignal.set(null);
     this.successSignal.set(false);
+  }
+
+  private readonly POLISH_TIMEOUT_MS = 30 * 1000;
+
+  polishMessage(message: string): Observable<ContactPolishResponse | null> {
+    return this.http
+      .post<ApiResponse<ContactPolishResponse>>(`${this.API_BASE_URL}/polish`, {
+        message,
+      } as ContactPolishRequest)
+      .pipe(
+        timeout(this.POLISH_TIMEOUT_MS),
+        map((response) => response.data ?? null),
+        catchError((err) => {
+          if (err instanceof TimeoutError) {
+            this.environmentService.warn('Polish request timed out after', this.POLISH_TIMEOUT_MS, 'ms');
+            return of(null);
+          }
+          this.environmentService.warn('Error polishing message:', err);
+          return of(null);
+        })
+      );
   }
 
 }
