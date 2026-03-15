@@ -1,0 +1,88 @@
+<button
+  class="chat-toggle-button"
+  type="button"
+  (click)="toggleOpen()"
+  aria-label="Ask about Kapil"
+  title="Ask About Kapil"
+>
+  <span class="chat-toggle-icon">
+    <img
+      [src]="owlIconPath"
+      alt=""
+      width="48"
+      height="48"
+      class="chat-toggle-owl"
+    />
+  </span>
+</button>
+
+@if (isOpen()) {
+  <section class="chat-panel" aria-label="Kapil portfolio chat">
+    <header class="chat-header">
+      <div class="chat-header-main">
+        <span class="chat-title">Ask About Kapil</span>
+        <span class="chat-subtitle">Portfolio assistant</span>
+      </div>
+      <button
+        type="button"
+        class="chat-close-button"
+        (click)="close()"
+        aria-label="Close chat"
+      >
+        <i class="fas fa-times"></i>
+      </button>
+    </header>
+
+    <div class="chat-messages" role="log" aria-live="polite">
+      @for (message of messages(); track trackByIndex($index)) {
+        <div
+          class="chat-message"
+          [class.chat-message-user]="message.role === 'user'"
+        >
+          <div class="chat-message-bubble">
+            {{ message.content }}
+          </div>
+        </div>
+      }
+      @if (isLoading()) {
+        <div class="chat-message">
+          <div class="chat-message-bubble chat-message-loading">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
+        </div>
+      }
+    </div>
+
+    <form
+      class="chat-input-row"
+      (submit)="$event.preventDefault(); send()"
+      aria-label="Ask a question about Kapil"
+    >
+      <div class="chat-input-wrap">
+        <textarea
+          class="chat-input"
+          rows="1"
+          maxlength="500"
+          [value]="inputValue()"
+          (input)="onInput($event)"
+          (keydown)="handleKeydown($event)"
+          placeholder="Ask about experience, skills, projects, blogs..."
+          aria-describedby="chat-char-hint"
+        ></textarea>
+        <span id="chat-char-hint" class="chat-char-hint" aria-live="polite"
+          >{{ inputValue().length }}/500</span
+        >
+      </div>
+      <button
+        type="submit"
+        class="chat-send-button"
+        [disabled]="isLoading() || !inputValue().trim()"
+        aria-label="Send question"
+      >
+        <i class="fas fa-paper-plane"></i>
+      </button>
+    </form>
+  </section>
+}

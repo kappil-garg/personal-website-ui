@@ -159,13 +159,18 @@
                   contactForm.get('message')?.value?.trim().length < 10
                 "
                 (click)="improveMessage()"
-                [title]="polishLoading() ? 'Improving...' : 'Improve message with AI'"
+                [title]="
+                  polishLoading() ? 'Improving...' : 'Improve message with AI'
+                "
                 aria-label="Improve message with AI"
               >
                 @if (polishLoading()) {
                   <i class="fas fa-spinner fa-spin" aria-hidden="true"></i>
                 } @else {
-                  <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
+                  <i
+                    class="fa-solid fa-wand-magic-sparkles"
+                    aria-hidden="true"
+                  ></i>
                 }
               </button>
             </div>

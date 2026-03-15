@@ -2,6 +2,7 @@ import { Component, computed, inject, OnInit, ChangeDetectionStrategy } from '@a
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { PortfolioService } from '../../services/portfolio.service';
+import { PortfolioChatWidgetComponent } from '../../shared/components/portfolio-chat-widget/portfolio-chat-widget.component';
 import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner/loading-spinner.component';
 import { ErrorStateComponent } from '../../shared/components/error-state/error-state.component';
 
@@ -12,6 +13,7 @@ import { ErrorStateComponent } from '../../shared/components/error-state/error-s
     CommonModule,
     LoadingSpinnerComponent,
     ErrorStateComponent,
+    PortfolioChatWidgetComponent,
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
