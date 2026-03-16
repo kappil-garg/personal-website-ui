@@ -23,3 +23,8 @@
 
 <!-- Footer -->
 <app-footer></app-footer>
+
+<!-- Global Portfolio Assistant (floating widget, fixed to viewport) -->
+@if (!isBlogDetailRoute()) {
+  <app-portfolio-chat-widget></app-portfolio-chat-widget>
+}

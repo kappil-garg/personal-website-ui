@@ -35,7 +35,7 @@ I value keeping my site open source, but plagiarism is bad. It's disheartening w
 
 ## 👨‍💻 About the Developer
 
-**Kapil Garg** - Java Full Stack Developer
+**Kapil Garg** - Senior Java Backend Engineer
 
 - **Location**: India
 - **Website**: [kappilgarg.dev](https://kappilgarg.dev)

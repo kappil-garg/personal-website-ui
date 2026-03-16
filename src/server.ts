@@ -6,7 +6,13 @@ const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();
 
-const defaultAllowedHosts = ['localhost', '127.0.0.1'];
+// Allowed hosts for Angular SSR (SSRF protection). Override in production via SSR_ALLOWED_HOSTS (comma-separated; use '*' to allow any).
+const defaultAllowedHosts = [
+  'localhost',
+  '127.0.0.1',
+  'kappilgarg.dev',
+  'www.kappilgarg.dev',
+];
 const rawAllowedHosts = process.env['SSR_ALLOWED_HOSTS'];
 
 let allowedHosts: string[] | undefined = defaultAllowedHosts;
@@ -19,7 +25,8 @@ if (rawAllowedHosts && rawAllowedHosts.trim().length > 0) {
       .split(',')
       .map((host) => host.trim())
       .filter((host) => host.length > 0);
-    allowedHosts = parsed.length > 0 ? parsed : undefined;
+    // If parsing yields no valid hosts, fall back to the default allowlist instead of disabling it.
+    allowedHosts = parsed.length > 0 ? parsed : defaultAllowedHosts;
   }
 }
 

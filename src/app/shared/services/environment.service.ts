@@ -72,19 +72,33 @@ export class EnvironmentService {
   /**
    * Log debug information only in development mode
    */
-  debug(message: string, ...args: unknown[]): void {
+  logDebug(message: string, ...args: unknown[]): void {
     if (this.isDebugModeEnabled) {
       console.log(`[${this.appName}] ${message}`, ...args);
     }
   }
 
   /**
+   * Backwards-compatible alias for logDebug.
+   */
+  debug(message: string, ...args: unknown[]): void {
+    this.logDebug(message, ...args);
+  }
+
+  /**
    * Log warnings in development mode
    */
-  warn(message: string, ...args: unknown[]): void {
+  logWarn(message: string, ...args: unknown[]): void {
     if (this.isDebugModeEnabled) {
       console.warn(`[${this.appName}] ${message}`, ...args);
     }
+  }
+
+  /**
+   * Backwards-compatible alias for logWarn.
+   */
+  warn(message: string, ...args: unknown[]): void {
+    this.logWarn(message, ...args);
   }
   
 }

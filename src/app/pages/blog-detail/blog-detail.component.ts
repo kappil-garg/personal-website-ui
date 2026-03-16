@@ -2,7 +2,7 @@ import { Component, OnInit, signal, computed, ChangeDetectionStrategy, inject, O
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { Subject, takeUntil, Observable, map, Subscription, catchError, finalize } from 'rxjs';
+import { Observable, map, Subscription, catchError, finalize } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { marked } from 'marked';
 import { BlogService } from '../../services/blog.service';
@@ -16,7 +16,7 @@ import { PortfolioService } from '../../services/portfolio.service';
 import { BlogDetailResult } from '../../models/blog.interface';
 import { EnvironmentService } from '../../shared/services/environment.service';
 
-const CHATHEAD_ICON = 'assets/icons/owl-icon.png';
+const CHATHEAD_ICON = 'assets/icons/blogs-q-a.png';
 
 @Component({
   selector: 'app-blog-detail',
@@ -55,7 +55,6 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
   private chatheadOpen = signal(false);
   private showChathead = signal(false);
 
-  private destroy$ = new Subject<void>();
   private askSubscription: Subscription | null = null;
 
   readonly chatheadIconPath = CHATHEAD_ICON;
@@ -104,12 +103,12 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.route.data.pipe(takeUntil(this.destroy$)).subscribe((data) => {
+    this.route.data.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((data) => {
       const result = data['blog'] as BlogDetailResult | undefined;
       if (!result) {
         this.apiErrorSignal.set(true);
         this.currentBlogSignal.set(null);
-        this.environmentService.warn('BlogDetail: Route resolver data missing - routing configuration issue');
+        this.environmentService.logWarn('BlogDetail: Route resolver data missing - routing configuration issue');
         return;
       }
       if (result.blog) {
@@ -127,7 +126,7 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
         this.currentBlogSignal.set(null);
         this.scrollToTop();
       } else {
-        this.environmentService.warn('BlogDetail: Unexpected resolver state - blog and error both null');
+        this.environmentService.logWarn('BlogDetail: Unexpected resolver state - blog and error both null');
         this.router.navigate(['/blogs']);
       }
     });
@@ -138,8 +137,6 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
       this.askSubscription.unsubscribe();
       this.askSubscription = null;
     }
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 
   private incrementViewCount(blogId: string): void {

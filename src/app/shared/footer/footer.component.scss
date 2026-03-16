@@ -42,13 +42,26 @@
   max-width: var(--container-lg);
   margin: 0 auto;
   padding: 0 var(--space-4);
+  /* Reserve space for "Ask About Kapil" chat widget so Connect / footer content is not covered */
+  padding-right: max(
+    var(--space-4),
+    calc(var(--space-4) + 56px + var(--space-4))
+  );
 
   @include tablet-up {
     padding: 0 var(--space-6);
+    padding-right: max(
+      var(--space-6),
+      calc(var(--space-6) + 56px + var(--space-4))
+    );
   }
 
   @include desktop-up {
     padding: 0 var(--space-8);
+    padding-right: max(
+      var(--space-8),
+      calc(var(--space-6) + 56px + var(--space-4))
+    );
   }
 }
 
