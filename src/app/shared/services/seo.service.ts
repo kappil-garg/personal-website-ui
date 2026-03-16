@@ -15,8 +15,8 @@ export class SeoService {
   private readonly author = 'Kapil Garg';
   private readonly baseUrl = 'https://www.kappilgarg.dev';
   private readonly defaultImage = 'https://www.kappilgarg.dev/assets/images/profile-pic.png';
-  private readonly defaultTitle = 'Kapil Garg - Java Full Stack Developer & Tech Explorer';
-  private readonly defaultDescription = 'Full Stack Java Developer with 8+ years of experience in enterprise-grade software solutions. Specialized in Spring Boot, Angular, and modern web technologies.';
+  private readonly defaultTitle = 'Kapil Garg - Senior Java Backend Engineer & Tech Explorer';
+  private readonly defaultDescription = 'Senior Java Backend Engineer with 8+ years of experience in enterprise-grade software solutions. Specialized in Spring Boot, Angular, and modern web technologies.';
 
   setBlogPostMetaTags(blog: Blog): void {
     const title = `${blog.title} - Kapil Garg`;
@@ -54,7 +54,7 @@ export class SeoService {
     const readableTitle = this.slugToReadableTitle(slug);
     const title = `${readableTitle} - Kapil Garg`;
     const url = `${this.baseUrl}/blogs/${slug}`;
-    const description = `Read "${readableTitle}" by Kapil Garg - Java Full Stack Developer sharing insights on technology, career, and software development.`;
+    const description = `Read "${readableTitle}" by Kapil Garg - Senior Java Backend Engineer sharing insights on technology, career, and software development.`;
     this.title.setTitle(title);
     this.updateOrCreateMetaTag('name', 'description', description);
     this.updateOrCreateMetaTag('name', 'author', this.author);

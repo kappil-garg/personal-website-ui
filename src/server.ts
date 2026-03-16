@@ -25,7 +25,8 @@ if (rawAllowedHosts && rawAllowedHosts.trim().length > 0) {
       .split(',')
       .map((host) => host.trim())
       .filter((host) => host.length > 0);
-    allowedHosts = parsed.length > 0 ? parsed : undefined;
+    // If parsing yields no valid hosts, fall back to the default allowlist instead of disabling it.
+    allowedHosts = parsed.length > 0 ? parsed : defaultAllowedHosts;
   }
 }
 

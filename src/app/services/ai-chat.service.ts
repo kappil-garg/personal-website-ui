@@ -40,13 +40,13 @@ export class AiChatService {
         map(response => response.data ?? null),
         catchError(err => {
           if (err instanceof HttpErrorResponse && err.status === 429) {
-            this.environmentService.warn('Portfolio chat rate limited (429)');
+            this.environmentService.logWarn('Portfolio chat rate limited (429)');
             return throwError(() => new PortfolioChatRateLimitError('Too many requests. Please try again later.'));
           }
           if (err instanceof TimeoutError) {
-            this.environmentService.warn('Portfolio chat request timed out after', this.REQUEST_TIMEOUT_MS, 'ms');
+            this.environmentService.logWarn('Portfolio chat request timed out after', this.REQUEST_TIMEOUT_MS, 'ms');
           } else {
-            this.environmentService.warn('Error calling portfolio chat API:', err);
+            this.environmentService.logWarn('Error calling portfolio chat API:', err);
           }
           return of(null);
         }),

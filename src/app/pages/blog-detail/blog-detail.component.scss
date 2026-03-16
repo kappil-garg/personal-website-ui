@@ -308,10 +308,10 @@
     background: var(--color-surface);
     border-left: 4px solid var(--color-primary);
     border-radius: var(--radius-base);
-    font-size: var(--font-size-xl);
+    font-size: var(--font-size-lg);
     font-style: italic;
     color: var(--color-text);
-    line-height: var(--line-height-very-loose);
+    line-height: var(--line-height-relaxed);
     text-align: justify;
     min-height: auto;
     height: auto;
@@ -321,8 +321,8 @@
       white-space: normal;
       word-wrap: break-word;
       overflow-wrap: break-word;
-      font-size: var(--font-size-xl);
-      line-height: var(--line-height-very-loose);
+      font-size: var(--font-size-lg);
+      line-height: var(--line-height-relaxed);
       text-align: justify;
       color: var(--color-text);
     }
@@ -384,14 +384,14 @@
       border-radius: var(--radius-base);
       font-style: italic;
       color: var(--color-text);
-      font-size: var(--font-size-xl);
-      line-height: var(--line-height-very-loose);
+      font-size: var(--font-size-lg);
+      line-height: var(--line-height-relaxed);
       text-align: justify;
 
       p {
         margin: 0;
-        font-size: var(--font-size-xl);
-        line-height: var(--line-height-very-loose);
+        font-size: var(--font-size-lg);
+        line-height: var(--line-height-relaxed);
         text-align: justify;
         color: var(--color-text);
         font-style: italic;
@@ -515,10 +515,6 @@
 
     .text-left {
       text-align: left;
-    }
-
-    .text-right {
-      text-align: right;
     }
 
     .code-block {
@@ -1136,6 +1132,7 @@
     color: var(--color-text);
     line-height: 1.5;
     margin: 0;
+    text-align: justify;
   }
 
   ::ng-deep .ask-answer-text {

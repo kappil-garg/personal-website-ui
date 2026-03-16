@@ -75,9 +75,9 @@ export class PortfolioService {
   private loadFallbackData(): void {
     const fallbackInfo: PersonalInfo = {
       name: 'Kapil Garg',
-      tagline: 'Full Stack Developer',
+      tagline: 'Senior Java Backend Engineer',
       description: [
-        'Java Full Stack Developer with experience in enterprise applications.',
+        'Senior Java Backend Engineer with experience in enterprise applications.',
       ],
       profileImage: 'assets/images/profile-pic.png',
     };

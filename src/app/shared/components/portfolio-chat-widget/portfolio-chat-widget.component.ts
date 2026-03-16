@@ -1,7 +1,10 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, Signal, WritableSignal, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, WritableSignal, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { AiChatService, PortfolioChatRateLimitError, PortfolioChatResponse } from '../../../services/ai-chat.service';
+import { finalize } from 'rxjs/operators';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { marked } from 'marked';
 
 const OWL_ICON_PATH = 'assets/icons/owl-icon.png';
 
@@ -23,6 +26,7 @@ export class PortfolioChatWidgetComponent {
   readonly owlIconPath = OWL_ICON_PATH;
   private readonly aiChatService = inject(AiChatService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly sanitizer = inject<DomSanitizer>(DomSanitizer);
 
   isOpen: WritableSignal<boolean> = signal(false);
   isLoading: WritableSignal<boolean> = signal(false);
@@ -31,11 +35,9 @@ export class PortfolioChatWidgetComponent {
     {
       role: 'assistant',
       content:
-        "Hi! I'm Kapil's portfolio assistant. Ask me about his experience, skills, projects, education, or what he's written about on his blog. For more detail on a specific post, go to Blogs and open that post—you can use the chat there too.",
+        "Hi! I'm Kapil's portfolio assistant. Ask me about his experience, skills, projects, education, or what he's written about on his blog. For more detail on a specific post, go to Blogs and open that post. You can use the chat there too.",
     },
   ]);
-
-  readonly hasMessages: Signal<boolean> = computed(() => this.messages().length > 0);
 
   toggleOpen(): void {
     this.isOpen.update(value => !value);
@@ -63,7 +65,12 @@ export class PortfolioChatWidgetComponent {
     this.isLoading.set(true);
     this.aiChatService
       .sendMessage(text)
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => {
+          this.isLoading.set(false);
+        }),
+      )
       .subscribe({
         next: (response: PortfolioChatResponse | null) => {
           const reply = response?.reply?.trim()
@@ -80,9 +87,6 @@ export class PortfolioChatWidgetComponent {
             content: message,
           });
         },
-        complete: () => {
-          this.isLoading.set(false);
-        },
       });
   }
 
@@ -95,6 +99,12 @@ export class PortfolioChatWidgetComponent {
 
   trackByIndex(index: number): number {
     return index;
+  }
+
+  getMessageHtml(message: ChatMessage): SafeHtml {
+    const rendered = marked.parseInline(message.content) as string | Promise<string>;
+    const rawHtml = typeof rendered === 'string' ? rendered : '';
+    return this.sanitizer.bypassSecurityTrustHtml(rawHtml);
   }
 
   private appendMessage(message: ChatMessage): void {

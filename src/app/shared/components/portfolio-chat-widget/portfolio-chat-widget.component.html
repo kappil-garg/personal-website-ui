@@ -39,9 +39,10 @@
           class="chat-message"
           [class.chat-message-user]="message.role === 'user'"
         >
-          <div class="chat-message-bubble">
-            {{ message.content }}
-          </div>
+          <div
+            class="chat-message-bubble"
+            [innerHTML]="getMessageHtml(message)"
+          ></div>
         </div>
       }
       @if (isLoading()) {
@@ -63,7 +64,7 @@
       <div class="chat-input-wrap">
         <textarea
           class="chat-input"
-          rows="1"
+          rows="3"
           maxlength="500"
           [value]="inputValue()"
           (input)="onInput($event)"

@@ -45,7 +45,7 @@
   /* Reserve space for "Ask About Kapil" chat widget so Connect / footer content is not covered */
   padding-right: max(
     var(--space-4),
-    calc(var(--space-6) + 56px + var(--space-4))
+    calc(var(--space-4) + 56px + var(--space-4))
   );
 
   @include tablet-up {
