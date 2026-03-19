@@ -1,6 +1,6 @@
 import { Component, OnInit, computed, inject, ChangeDetectionStrategy, ChangeDetectorRef, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ProjectService } from '../../services/project.service';
 import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner/loading-spinner.component';
@@ -13,6 +13,7 @@ import { EnvironmentService } from '../../shared/services/environment.service';
   standalone: true,
   imports: [
     CommonModule,
+    RouterModule,
     LoadingSpinnerComponent,
     ErrorStateComponent,
   ],
@@ -74,13 +75,6 @@ export class ProjectsComponent implements OnInit {
 
   openProjectDetail(projectId: string): void {
     this.router.navigate(['/projects', projectId]);
-  }
-
-  openProjectDetailWithKeyboard(event: KeyboardEvent, projectId: string): void {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      this.openProjectDetail(projectId);
-    }
   }
 
 }

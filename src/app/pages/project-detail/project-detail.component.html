@@ -12,7 +12,7 @@
         (retry)="retryLoadProject()"
       />
       <button class="back-btn secondary-action" (click)="goBackToProjects()">
-        <i class="fas fa-arrow-left"></i>
+        <i class="fas fa-arrow-left" aria-hidden="true"></i>
         Back to Projects
       </button>
     </div>
@@ -22,7 +22,7 @@
     <div class="project-detail-container">
       <div class="project-nav">
         <button class="back-btn" (click)="goBackToProjects()">
-          <i class="fas fa-arrow-left"></i>
+          <i class="fas fa-arrow-left" aria-hidden="true"></i>
           Back to Projects
         </button>
       </div>
@@ -117,7 +117,7 @@
                 rel="noopener noreferrer"
                 class="github-link"
               >
-                <i class="fab fa-github"></i>
+                <i class="fab fa-github" aria-hidden="true"></i>
                 {{ link.label || "View on GitHub" }}
               </a>
             }

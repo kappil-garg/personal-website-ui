@@ -7,7 +7,6 @@ import { ProjectService } from '../../services/project.service';
 import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner/loading-spinner.component';
 import { ErrorStateComponent } from '../../shared/components/error-state/error-state.component';
 import { SeoService } from '../../shared/services/seo.service';
-import { EnvironmentService } from '../../shared/services/environment.service';
 
 @Component({
   selector: 'app-project-detail',
@@ -24,7 +23,6 @@ export class ProjectDetailComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly projectService = inject(ProjectService);
   private readonly seoService = inject(SeoService);
-  private readonly environmentService = inject(EnvironmentService);
 
   private readonly currentProjectSignal = signal<Project | null>(null);
   private readonly projectLoadErrorSignal = signal<string | null>(null);
@@ -55,10 +53,6 @@ export class ProjectDetailComponent {
         }
         this.currentProjectSignal.set(project);
         this.seoService.setProjectDetailMetaTags(project);
-      },
-      error: error => {
-        this.environmentService.warn('Failed to load project details:', error);
-        this.projectLoadErrorSignal.set('Project details are unavailable right now. Please try again.');
       },
     });
   }

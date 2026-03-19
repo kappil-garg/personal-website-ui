@@ -35,14 +35,7 @@
     @if (!loading() && !hasError() && projects().length > 0) {
       <div class="projects-grid">
         @for (project of projects(); track project.id) {
-          <article
-            class="project-card"
-            tabindex="0"
-            role="button"
-            [attr.aria-label]="'Open details for ' + project.title"
-            (click)="openProjectDetail(project.id)"
-            (keydown)="openProjectDetailWithKeyboard($event, project.id)"
-          >
+          <article class="project-card" (click)="openProjectDetail(project.id)">
             <div class="project-image">
               <img
                 [src]="project.featuredImage"
@@ -87,7 +80,16 @@
             </div>
 
             <div class="project-content">
-              <h2 class="project-title">{{ project.title }}</h2>
+              <h2 class="project-title">
+                <a
+                  class="project-title-link"
+                  [routerLink]="['/projects', project.id]"
+                  [attr.aria-label]="'Open details for ' + project.title"
+                  (click)="$event.stopPropagation()"
+                >
+                  {{ project.title }}
+                </a>
+              </h2>
               <p class="project-description">
                 {{ project.shortDescription }}
               </p>
