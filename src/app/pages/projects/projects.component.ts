@@ -1,5 +1,6 @@
 import { Component, OnInit, computed, inject, ChangeDetectionStrategy, ChangeDetectorRef, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router, RouterModule } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ProjectService } from '../../services/project.service';
 import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner/loading-spinner.component';
@@ -12,6 +13,7 @@ import { EnvironmentService } from '../../shared/services/environment.service';
   standalone: true,
   imports: [
     CommonModule,
+    RouterModule,
     LoadingSpinnerComponent,
     ErrorStateComponent,
   ],
@@ -23,6 +25,7 @@ export class ProjectsComponent implements OnInit {
 
   private destroyRef = inject(DestroyRef);
   private cdr = inject(ChangeDetectorRef);
+  private router = inject(Router);
 
   private seoService = inject(SeoService);
   public projectService = inject(ProjectService);
@@ -68,6 +71,10 @@ export class ProjectsComponent implements OnInit {
         this.cdr.markForCheck();
       }
     });
+  }
+
+  openProjectDetail(projectId: string): void {
+    this.router.navigate(['/projects', projectId]);
   }
 
 }

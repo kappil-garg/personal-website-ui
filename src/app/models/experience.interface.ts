@@ -3,14 +3,14 @@ export interface Experience {
   companyName: string;
   position: string;
   location?: string;
-  /** Start date in MM-YYYY format (e.g., "12-2025") */
+  /** Start date in YYYY-MM format (e.g., "2025-12") */
   startDate: string;
-  /** End date in MM-YYYY format (e.g., "12-2025"). Optional if isCurrent is true. */
+  /** End date in YYYY-MM format (e.g., "2025-12"). Optional if isCurrent is true. */
   endDate?: string;
   isCurrent: boolean;
-  description: string[];
-  technologies?: string[];
-  achievements?: string[];
+  summary: string[];
+  impact?: string[];
+  highlights?: string[];
   companyLogo?: string;
   companyWebsite?: string;
   createdAt?: string;

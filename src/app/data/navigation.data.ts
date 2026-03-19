@@ -15,39 +15,32 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
     icon: 'fas fa-briefcase',
   },
   {
-    id: 'skills',
-    label: 'Skills',
-    route: '/skills',
-    order: 2,
-    icon: 'fas fa-code',
-  },
-  {
     id: 'projects',
     label: 'Projects',
     route: '/projects',
-    order: 3,
+    order: 2,
     icon: 'fas fa-project-diagram',
-  },
-  {
-    id: 'education',
-    label: 'Education',
-    route: '/education',
-    order: 4,
-    icon: 'fas fa-graduation-cap',
   },
   {
     id: 'blogs',
     label: 'Blogs',
     route: '/blogs',
-    order: 5,
+    order: 3,
     icon: 'fas fa-blog',
+  },
+  {
+    id: 'contact',
+    label: 'Contact',
+    route: '/contact',
+    order: 4,
+    icon: 'fas fa-envelope',
   },
 ];
 
 export const FOOTER_LINKS: NavigationItem[] = [
   {
     id: 'contact',
-    label: 'Connect with Me',
+    label: "Let's Connect",
     route: '/contact',
     order: 1,
     icon: 'fas fa-envelope',

@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { Title, Meta } from '@angular/platform-browser';
 import { DOCUMENT } from '@angular/common';
 import { Blog } from '../../models/blog.interface';
+import { Project } from '../../models/project.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -134,6 +135,27 @@ export class SeoService {
       imageAlt: title,
     });
     this.updateOrCreateLinkTag('canonical', url);
+  }
+
+  setProjectDetailMetaTags(project: Project): void {
+    const title = `${project.title} - Project | Kapil Garg`;
+    const projectUrl = `${this.baseUrl}/projects/${project.id}`;
+    const description = project.shortDescription
+      || 'Detailed case study of this project, including architecture decisions and implementation impact.';
+    const image = project.featuredImage?.trim()
+      ? this.normalizeImageUrl(project.featuredImage)
+      : this.defaultImage;
+    this.title.setTitle(title);
+    this.updateOrCreateMetaTag('name', 'description', description);
+    this.setSocialMeta({
+      type: 'website',
+      title,
+      description,
+      url: projectUrl,
+      image,
+      imageAlt: project.title,
+    });
+    this.updateOrCreateLinkTag('canonical', projectUrl);
   }
 
   setEducationMetaTags(): void {

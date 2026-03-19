@@ -1,7 +1,8 @@
 <nav class="navbar" [class.scrolled]="isScrolled()">
   <div class="nav-container">
     <div class="nav-logo">
-      <a routerLink="/home" class="logo-link">
+      <a routerLink="/home" class="logo-link" aria-label="Home">
+        <span class="logo-tooltip" aria-hidden="true">Home</span>
         <img
           src="assets/images/personal-icon.png"
           alt="KG"

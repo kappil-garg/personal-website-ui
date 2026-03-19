@@ -79,4 +79,27 @@ export class ProjectService {
     );
   }
 
+  fetchProjectById(id: string): Observable<Project | null> {
+    const cached = this.projectsSignal().find(project => project.id === id);
+    if (cached) {
+      return of(cached);
+    }
+    this.loadingSignal.set(true);
+    return this.http.get<ApiResponse<Project>>(`${this.API_BASE_URL}/${id}`).pipe(
+      timeout(this.REQUEST_TIMEOUT_MS),
+      map(response => response.data ?? null),
+      catchError(error => {
+        if (error instanceof TimeoutError) {
+          this.environmentService.warn('Project detail request timed out after', this.REQUEST_TIMEOUT_MS, 'ms');
+        } else {
+          this.environmentService.warn('Error fetching project detail:', error);
+        }
+        return of(null);
+      }),
+      finalize(() => {
+        this.loadingSignal.set(false);
+      })
+    );
+  }
+
 }

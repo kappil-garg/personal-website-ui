@@ -57,22 +57,22 @@ export class ExperienceComponent implements OnInit {
 
   /**
    * Formats and returns the duration string for an experience entry.
-   * Expects dates in MM-YYYY format (e.g., "12-2025" for December 2025).
+   * Expects dates in YYYY-MM format (e.g., "2025-12" for December 2025).
    * 
-   * @param startDate - Start date in MM-YYYY format
-   * @param endDate - Optional end date in MM-YYYY format
+   * @param startDate - Start date in YYYY-MM format
+   * @param endDate - Optional end date in YYYY-MM format
    * @param isCurrent - Whether this is the current position
    * @returns Formatted duration string (e.g., "Dec 2025 - Present" or "Dec 2024 - Dec 2025")
    */
   getDuration(startDate: string, endDate?: string, isCurrent?: boolean): string {
-    const [startMonth, startYear] = startDate.split('-');
+    const [startYear, startMonth] = startDate.split('-');
     const startDateObj = new Date(parseInt(startYear, 10), parseInt(startMonth, 10) - 1, 1);
     const startMonthFormatted = startDateObj.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
     if (isCurrent) {
       return `${startMonthFormatted} - Present`;
     }
     if (endDate) {
-      const [endMonth, endYear] = endDate.split('-');
+      const [endYear, endMonth] = endDate.split('-');
       const endDateObj = new Date(parseInt(endYear, 10), parseInt(endMonth, 10) - 1, 1);
       const endMonthFormatted = endDateObj.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
       return `${startMonthFormatted} - ${endMonthFormatted}`;
