@@ -121,56 +121,53 @@
 
               <!-- Card Body -->
               <div class="card-body">
-                <!-- Description -->
-                @if (
-                  experience.description && experience.description.length > 0
-                ) {
-                  <div class="description-section">
-                    <ul class="description-list">
-                      @for (desc of experience.description; track $index) {
-                        <li>{{ desc }}</li>
+                <!-- Summary -->
+                @if (experience.summary && experience.summary.length > 0) {
+                  <div class="summary-section">
+                    <h4 class="section-title">
+                      <i class="fas fa-list-check" aria-hidden="true"></i>
+                      Summary
+                    </h4>
+                    <ul class="summary-list">
+                      @for (point of experience.summary; track $index) {
+                        <li>{{ point }}</li>
                       }
                     </ul>
                   </div>
                 }
 
-                <!-- Technologies -->
-                @if (
-                  experience.technologies && experience.technologies.length > 0
-                ) {
-                  <div class="technologies-section">
+                <!-- Impact -->
+                @if (experience.impact && experience.impact.length > 0) {
+                  <div class="impact-section">
                     <h4 class="section-title">
-                      <i class="fas fa-code" aria-hidden="true"></i>
-                      Technologies
+                      <i class="fas fa-chart-line" aria-hidden="true"></i>
+                      Impact
                     </h4>
-                    <div class="technologies-list">
-                      @for (tech of experience.technologies; track $index) {
-                        <span class="tech-badge">{{ tech }}</span>
-                      }
-                    </div>
-                  </div>
-                }
-
-                <!-- Achievements -->
-                @if (
-                  experience.achievements && experience.achievements.length > 0
-                ) {
-                  <div class="achievements-section">
-                    <h4 class="section-title">
-                      <i class="fas fa-trophy" aria-hidden="true"></i>
-                      Key Achievements
-                    </h4>
-                    <ul class="achievements-list">
-                      @for (
-                        achievement of experience.achievements;
-                        track $index
-                      ) {
+                    <ul class="impact-list">
+                      @for (item of experience.impact; track $index) {
                         <li>
                           <i class="fas fa-check-circle" aria-hidden="true"></i>
-                          {{ achievement }}
+                          {{ item }}
                         </li>
                       }
                     </ul>
+                  </div>
+                }
+
+                <!-- Highlights -->
+                @if (
+                  experience.highlights && experience.highlights.length > 0
+                ) {
+                  <div class="highlights-section">
+                    <h4 class="section-title">
+                      <i class="fas fa-star" aria-hidden="true"></i>
+                      Highlights
+                    </h4>
+                    <div class="highlights-list">
+                      @for (highlight of experience.highlights; track $index) {
+                        <span class="highlight-badge">{{ highlight }}</span>
+                      }
+                    </div>
                   </div>
                 }
               </div>

@@ -24,19 +24,9 @@ export const routes: Routes = [
     title: 'Projects - Kapil Garg'
   },
   {
-    path: 'skills',
-    loadComponent: () => import('./pages/skills/skills.component').then(m => m.SkillsComponent),
-    title: 'Skills - Kapil Garg'
-  },
-  {
-    path: 'education',
-    loadComponent: () => import('./pages/education/education.component').then(m => m.EducationComponent),
-    title: 'Education - Kapil Garg'
-  },
-  {
-    path: 'certifications',
-    redirectTo: '/education',
-    pathMatch: 'full'
+    path: 'projects/:id',
+    loadComponent: () => import('./pages/project-detail/project-detail.component').then(m => m.ProjectDetailComponent),
+    title: 'Project Details - Kapil Garg'
   },
   {
     path: 'blogs',

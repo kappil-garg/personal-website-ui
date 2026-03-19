@@ -53,6 +53,35 @@
     cursor: pointer;
     transition: all var(--duration-fast) var(--ease-standard);
     text-decoration: none;
+    position: relative;
+  }
+
+  .logo-tooltip {
+    position: absolute;
+    left: 50%;
+    top: calc(100% + var(--space-1));
+    transform: translateX(-50%) translateY(-2px);
+    background: var(--color-text);
+    color: var(--color-surface);
+    font-size: 12px;
+    font-weight: var(--font-weight-medium);
+    line-height: 1;
+    padding: 0.35rem 0.5rem;
+    border-radius: var(--radius-base);
+    opacity: 0;
+    pointer-events: none;
+    white-space: nowrap;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    transition:
+      opacity var(--duration-fast) var(--ease-standard),
+      transform var(--duration-fast) var(--ease-standard);
+    z-index: 1010;
+  }
+
+  .logo-link:hover .logo-tooltip,
+  .logo-link:focus-visible .logo-tooltip {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
   }
 
   .logo-image {

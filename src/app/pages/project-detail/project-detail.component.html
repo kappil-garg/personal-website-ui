@@ -1,0 +1,129 @@
+<section class="project-detail-section section">
+  @if (loading()) {
+    <app-loading-spinner message="Loading project details..." />
+  }
+
+  @if (error()) {
+    <div class="error-state-wrapper">
+      <app-error-state
+        [message]="error()!"
+        [showRetry]="true"
+        retryText="Try Again"
+        (retry)="retryLoadProject()"
+      />
+      <button class="back-btn secondary-action" (click)="goBackToProjects()">
+        <i class="fas fa-arrow-left"></i>
+        Back to Projects
+      </button>
+    </div>
+  }
+
+  @if (!loading() && !error() && project()) {
+    <div class="project-detail-container">
+      <div class="project-nav">
+        <button class="back-btn" (click)="goBackToProjects()">
+          <i class="fas fa-arrow-left"></i>
+          Back to Projects
+        </button>
+      </div>
+
+      <header class="project-header">
+        <h1 class="project-title">{{ project()!.title }}</h1>
+        <p class="project-short-description">
+          {{ project()!.shortDescription }}
+        </p>
+
+        <div class="project-meta">
+          @if (project()!.startDate || project()!.endDate) {
+            <span class="project-duration">
+              {{ formatMonthYear(project()!.startDate) || "N/A" }} -
+              {{
+                formatMonthYear(project()!.endDate) ||
+                  (project()!.isActive ? "Present" : "N/A")
+              }}
+            </span>
+          }
+        </div>
+      </header>
+
+      @if (project()!.featuredImage) {
+        <div class="project-image">
+          <img [src]="project()!.featuredImage" [alt]="project()!.title" />
+        </div>
+      }
+
+      <article class="project-content">
+        @if (project()!.overview && project()!.overview!.length > 0) {
+          <section class="content-section">
+            <h2>Overview</h2>
+            <ul>
+              @for (item of project()!.overview!; track $index) {
+                <li>{{ item }}</li>
+              }
+            </ul>
+          </section>
+        }
+
+        @if (project()!.keyFeatures && project()!.keyFeatures!.length > 0) {
+          <section class="content-section">
+            <h2>Key Features</h2>
+            <ul>
+              @for (item of project()!.keyFeatures!; track $index) {
+                <li>{{ item }}</li>
+              }
+            </ul>
+          </section>
+        }
+
+        @if (project()!.engineering && project()!.engineering!.length > 0) {
+          <section class="content-section">
+            <h2>Engineering</h2>
+            <ul>
+              @for (item of project()!.engineering!; track $index) {
+                <li>{{ item }}</li>
+              }
+            </ul>
+          </section>
+        }
+
+        @if (project()!.decisions && project()!.decisions!.length > 0) {
+          <section class="content-section featured-section">
+            <h2>Decisions ⭐</h2>
+            <ul>
+              @for (item of project()!.decisions!; track $index) {
+                <li>{{ item }}</li>
+              }
+            </ul>
+          </section>
+        }
+
+        @if (project()!.impact && project()!.impact!.length > 0) {
+          <section class="content-section">
+            <h2>Impact</h2>
+            <ul>
+              @for (item of project()!.impact!; track $index) {
+                <li>{{ item }}</li>
+              }
+            </ul>
+          </section>
+        }
+
+        @if (project()!.githubLinks && project()!.githubLinks!.length > 0) {
+          <div class="project-links">
+            @for (link of project()!.githubLinks!; track $index) {
+              <a
+                [href]="link.url"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="github-link"
+              >
+                <i class="fab fa-github"></i>
+                {{ link.label || "View on GitHub" }}
+              </a>
+            }
+          </div>
+        }
+      </article>
+    </div>
+  }
+</section>

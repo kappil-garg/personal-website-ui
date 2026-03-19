@@ -422,7 +422,10 @@
 
 .description-section,
 .technologies-section,
-.achievements-section {
+.achievements-section,
+.summary-section,
+.impact-section,
+.highlights-section {
   margin-bottom: var(--space-6);
 
   &:last-child {
@@ -446,7 +449,8 @@
   }
 }
 
-.description-list {
+.description-list,
+.summary-list {
   list-style: none;
   padding: 0;
   margin: 0;
@@ -472,13 +476,15 @@
   }
 }
 
-.technologies-list {
+.technologies-list,
+.highlights-list {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
 }
 
-.tech-badge {
+.tech-badge,
+.highlight-badge {
   display: inline-block;
   padding: var(--space-2) var(--space-4);
   background: var(--color-gray-200);
@@ -501,7 +507,8 @@
   }
 }
 
-.achievements-list {
+.achievements-list,
+.impact-list {
   list-style: none;
   padding: 0;
   margin: 0;

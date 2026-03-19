@@ -35,7 +35,14 @@
     @if (!loading() && !hasError() && projects().length > 0) {
       <div class="projects-grid">
         @for (project of projects(); track project.id) {
-          <article class="project-card">
+          <article
+            class="project-card"
+            tabindex="0"
+            role="button"
+            [attr.aria-label]="'Open details for ' + project.title"
+            (click)="openProjectDetail(project.id)"
+            (keydown)="openProjectDetailWithKeyboard($event, project.id)"
+          >
             <div class="project-image">
               <img
                 [src]="project.featuredImage"
@@ -50,21 +57,30 @@
                     rel="noopener noreferrer"
                     class="project-link"
                     [attr.aria-label]="'Visit ' + project.title"
+                    (click)="$event.stopPropagation()"
                   >
                     <i class="fas fa-external-link-alt" aria-hidden="true"></i>
                     <span>View Project</span>
                   </a>
                 }
-                @if (project.githubUrl) {
+                @if (project.githubLinks && project.githubLinks.length > 0) {
                   <a
-                    [href]="project.githubUrl"
+                    [href]="project.githubLinks[0].url"
                     target="_blank"
                     rel="noopener noreferrer"
                     class="project-link github-link"
-                    [attr.aria-label]="'View ' + project.title + ' on GitHub'"
+                    [attr.aria-label]="
+                      'Open ' +
+                      (project.githubLinks[0].label || 'GitHub link') +
+                      ' for ' +
+                      project.title
+                    "
+                    (click)="$event.stopPropagation()"
                   >
                     <i class="fab fa-github" aria-hidden="true"></i>
-                    <span>View Code</span>
+                    <span>{{
+                      project.githubLinks[0].label || "View Code"
+                    }}</span>
                   </a>
                 }
               </div>
@@ -73,13 +89,13 @@
             <div class="project-content">
               <h2 class="project-title">{{ project.title }}</h2>
               <p class="project-description">
-                {{ project.shortDescription || project.description }}
+                {{ project.shortDescription }}
               </p>
 
-              @if (project.technologies && project.technologies.length > 0) {
+              @if (project.highlights && project.highlights.length > 0) {
                 <div class="project-technologies">
-                  @for (tech of project.technologies; track $index) {
-                    <span class="tech-badge">{{ tech }}</span>
+                  @for (highlight of project.highlights; track $index) {
+                    <span class="tech-badge">{{ highlight }}</span>
                   }
                 </div>
               }
