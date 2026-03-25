@@ -218,20 +218,24 @@
             Ask a question about this post and get an answer based on its
             content.
           </p>
-          <div class="ask-form">
+          <form
+            class="ask-form"
+            (submit)="$event.preventDefault(); submitAskQuestion()"
+            aria-label="Ask a question about this post"
+          >
             <textarea
               class="ask-input"
               [value]="askQuestionInputReadonly()"
               (input)="setAskQuestionInput($any($event.target).value)"
+              (keydown)="handleAskKeydown($event)"
               placeholder="e.g. What is the main takeaway?"
               rows="3"
               [disabled]="askLoading()"
             ></textarea>
             <button
-              type="button"
+              type="submit"
               class="ask-submit-btn"
               [disabled]="askLoading() || !askQuestionInputReadonly().trim()"
-              (click)="submitAskQuestion()"
             >
               @if (askLoading()) {
                 <i class="fas fa-spinner fa-spin" aria-hidden="true"></i>
@@ -241,7 +245,7 @@
                 <span>Ask</span>
               }
             </button>
-          </div>
+          </form>
           @if (askError()) {
             <p class="ask-error" role="alert">{{ askError() }}</p>
           }

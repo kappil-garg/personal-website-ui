@@ -18,6 +18,7 @@ export class AppComponent implements OnInit {
   private router = inject(Router);
   private platformId = inject(PLATFORM_ID);
   isBlogDetailRoute: WritableSignal<boolean> = signal(false);
+  isProjectDetailRoute: WritableSignal<boolean> = signal(false);
 
   ngOnInit(): void {
     if (isPlatformBrowser(this.platformId)) {
@@ -27,11 +28,14 @@ export class AppComponent implements OnInit {
           window.scrollTo(0, 0);
           const navEnd = event as NavigationEnd;
           const url = navEnd.urlAfterRedirects || navEnd.url;
-          this.isBlogDetailRoute.set(url.startsWith('/blogs/'));
+          const path = url.split('?')[0];
+          this.isBlogDetailRoute.set(path.startsWith('/blogs/'));
+          this.isProjectDetailRoute.set(/^\/projects\/[^/]+$/.test(path));
         });
       // Initialize route flag for first load
-      const currentUrl = this.router.url;
+      const currentUrl = this.router.url.split('?')[0];
       this.isBlogDetailRoute.set(currentUrl.startsWith('/blogs/'));
+      this.isProjectDetailRoute.set(/^\/projects\/[^/]+$/.test(currentUrl));
     }
   }
   

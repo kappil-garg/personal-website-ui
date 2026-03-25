@@ -1,7 +1,12 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, WritableSignal, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, WritableSignal, inject, input, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
-import { AiChatService, PortfolioChatRateLimitError, PortfolioChatResponse } from '../../../services/ai-chat.service';
+import {
+  AiChatService,
+  PortfolioChatRateLimitError,
+  PortfolioChatResponse,
+  PortfolioChatSource,
+} from '../../../services/ai-chat.service';
 import { finalize } from 'rxjs/operators';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { marked } from 'marked';
@@ -11,6 +16,7 @@ const OWL_ICON_PATH = 'assets/icons/owl-icon.png';
 interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
+  sources?: PortfolioChatSource[];
 }
 
 @Component({
@@ -24,6 +30,10 @@ interface ChatMessage {
 export class PortfolioChatWidgetComponent {
 
   readonly owlIconPath = OWL_ICON_PATH;
+
+  /** When set, the API scopes retrieval to this project (plus personal info). */
+  readonly projectContextId = input<string | null>(null);
+
   private readonly aiChatService = inject(AiChatService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly sanitizer = inject<DomSanitizer>(DomSanitizer);
@@ -63,8 +73,9 @@ export class PortfolioChatWidgetComponent {
     this.appendMessage({ role: 'user', content: text });
     this.inputValue.set('');
     this.isLoading.set(true);
+    const pid = this.projectContextId();
     this.aiChatService
-      .sendMessage(text)
+      .sendMessage(text, pid && pid.length > 0 ? pid : null)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => {
@@ -75,7 +86,12 @@ export class PortfolioChatWidgetComponent {
         next: (response: PortfolioChatResponse | null) => {
           const reply = response?.reply?.trim()
             || "Sorry, I couldn't answer that right now. Please try again in a moment.";
-          this.appendMessage({ role: 'assistant', content: reply });
+          const sources = response?.sources?.filter(s => s != null) ?? [];
+          this.appendMessage({
+            role: 'assistant',
+            content: reply,
+            sources: sources.length > 0 ? sources : undefined,
+          });
         },
         error: (err: unknown) => {
           const message =

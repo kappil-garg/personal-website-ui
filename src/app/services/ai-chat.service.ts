@@ -4,12 +4,22 @@ import { Observable, catchError, map, of, timeout, TimeoutError, throwError } fr
 import { EnvironmentService } from '../shared/services/environment.service';
 import { ApiResponse } from '../models/api-response.interface';
 
+export interface PortfolioChatSource {
+  type: string;
+  sourceId: string;
+  title: string;
+  slug?: string | null;
+  snippet?: string | null;
+}
+
 export interface PortfolioChatRequest {
   message: string;
+  projectId?: string | null;
 }
 
 export interface PortfolioChatResponse {
   reply: string;
+  sources?: PortfolioChatSource[];
 }
 
 /** Thrown when the API returns 429 Too Many Requests. */
@@ -31,8 +41,8 @@ export class AiChatService {
     return this.environmentService.getApiUrl('/ai/chat');
   }
 
-  sendMessage(message: string): Observable<PortfolioChatResponse | null> {
-    const payload: PortfolioChatRequest = { message };
+  sendMessage(message: string, projectId?: string | null): Observable<PortfolioChatResponse | null> {
+    const payload: PortfolioChatRequest = { message, projectId: projectId ?? undefined };
     return this.http
       .post<ApiResponse<PortfolioChatResponse>>(this.getChatUrl(), payload)
       .pipe(
