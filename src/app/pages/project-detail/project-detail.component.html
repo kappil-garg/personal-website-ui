@@ -127,3 +127,8 @@
     </div>
   }
 </section>
+
+<!-- Outside .section so content-visibility on .section does not trap fixed positioning -->
+@if (!loading() && !error() && project()) {
+  <app-portfolio-chat-widget [projectContextId]="project()!.id" />
+}

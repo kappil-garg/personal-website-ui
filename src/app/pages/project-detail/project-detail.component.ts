@@ -6,12 +6,19 @@ import { Project } from '../../models/project.interface';
 import { ProjectService } from '../../services/project.service';
 import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner/loading-spinner.component';
 import { ErrorStateComponent } from '../../shared/components/error-state/error-state.component';
+import { PortfolioChatWidgetComponent } from '../../shared/components/portfolio-chat-widget/portfolio-chat-widget.component';
 import { SeoService } from '../../shared/services/seo.service';
 
 @Component({
   selector: 'app-project-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, LoadingSpinnerComponent, ErrorStateComponent],
+  imports: [
+    CommonModule,
+    RouterModule,
+    LoadingSpinnerComponent,
+    ErrorStateComponent,
+    PortfolioChatWidgetComponent,
+  ],
   templateUrl: './project-detail.component.html',
   styleUrl: './project-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

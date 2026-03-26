@@ -17,11 +17,20 @@
 </button>
 
 @if (isOpen()) {
-  <section class="chat-panel" aria-label="Kapil portfolio chat">
+  <section
+    class="chat-panel"
+    [attr.aria-label]="
+      projectContextId() ? 'Project chat assistant' : 'Kapil portfolio chat'
+    "
+  >
     <header class="chat-header">
       <div class="chat-header-main">
-        <span class="chat-title">Ask About Kapil</span>
-        <span class="chat-subtitle">Portfolio assistant</span>
+        <span class="chat-title">{{
+          projectContextId() ? "Ask about this project" : "Ask About Kapil"
+        }}</span>
+        <span class="chat-subtitle">{{
+          projectContextId() ? "Scoped to this project" : "Portfolio assistant"
+        }}</span>
       </div>
       <button
         type="button"
@@ -43,6 +52,24 @@
             class="chat-message-bubble"
             [innerHTML]="getMessageHtml(message)"
           ></div>
+          @if (message.role === "assistant" && message.sources?.length) {
+            <div class="chat-sources" aria-label="Sources used for this answer">
+              <span class="chat-sources-label">Sources</span>
+              <ul>
+                @for (src of message.sources!; track $index) {
+                  <li>
+                    <span class="chat-source-type">{{ src.type }}</span>
+                    @if (src.title) {
+                      <span class="chat-source-title">{{ src.title }}</span>
+                    }
+                    @if (src.slug) {
+                      <span class="chat-source-slug">/{{ src.slug }}</span>
+                    }
+                  </li>
+                }
+              </ul>
+            </div>
+          }
         </div>
       }
       @if (isLoading()) {

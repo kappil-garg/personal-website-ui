@@ -258,6 +258,24 @@
   }
 }
 
+.footer-quote {
+  margin: calc(-1 * var(--space-2)) auto 0;
+  padding: 0 0 var(--space-4);
+  max-width: 32rem;
+  text-align: center;
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-relaxed);
+  font-style: italic;
+  font-weight: var(--font-weight-normal);
+  color: var(--color-text-secondary);
+  opacity: 0.78;
+  letter-spacing: 0.02em;
+
+  @include tablet-up {
+    padding-bottom: var(--space-5);
+  }
+}
+
 @include mobile-only {
   .footer-content {
     padding: var(--space-3) 0;

@@ -257,7 +257,19 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
     this.chatheadOpen.set(false);
   }
 
+  handleAskKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Enter' && event.shiftKey) {
+      event.preventDefault();
+      if (!this.askLoading() && this.askQuestionInput().trim()) {
+        this.submitAskQuestion();
+      }
+    }
+  }
+
   submitAskQuestion(): void {
+    if (this.askLoading()) {
+      return;
+    }
     const slug = this.route.snapshot.paramMap.get('slug');
     const question = this.askQuestionInput().trim();
     if (!slug || !question) return;

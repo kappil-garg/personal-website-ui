@@ -1,8 +1,8 @@
 diff --git a/node_modules/@angular/ssr/fesm2022/ssr.mjs b/node_modules/@angular/ssr/fesm2022/ssr.mjs
-index 0c5b5b4..a379acc 100644
+index c2e7ff7..6d8fb20 100644
 --- a/node_modules/@angular/ssr/fesm2022/ssr.mjs
 +++ b/node_modules/@angular/ssr/fesm2022/ssr.mjs
-@@ -2552,7 +2552,7 @@ class AngularAppEngine {
+@@ -2585,7 +2585,7 @@ class AngularAppEngine {
       * @param options Options for the Angular server application engine.
       */
      constructor(options) {

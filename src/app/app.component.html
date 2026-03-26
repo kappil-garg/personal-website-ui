@@ -25,6 +25,6 @@
 <app-footer></app-footer>
 
 <!-- Global Portfolio Assistant (floating widget, fixed to viewport) -->
-@if (!isBlogDetailRoute()) {
+@if (!isBlogDetailRoute() && !isProjectDetailRoute()) {
   <app-portfolio-chat-widget></app-portfolio-chat-widget>
 }
