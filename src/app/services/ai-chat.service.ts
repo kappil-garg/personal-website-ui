@@ -42,7 +42,7 @@ export class AiChatService {
   }
 
   sendMessage(message: string, projectId?: string | null): Observable<PortfolioChatResponse | null> {
-    const payload: PortfolioChatRequest = { message, projectId: projectId ?? undefined };
+    const payload: PortfolioChatRequest = { message, projectId };
     return this.http
       .post<ApiResponse<PortfolioChatResponse>>(this.getChatUrl(), payload)
       .pipe(

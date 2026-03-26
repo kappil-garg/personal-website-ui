@@ -17,7 +17,12 @@
 </button>
 
 @if (isOpen()) {
-  <section class="chat-panel" aria-label="Kapil portfolio chat">
+  <section
+    class="chat-panel"
+    [attr.aria-label]="
+      projectContextId() ? 'Project chat assistant' : 'Kapil portfolio chat'
+    "
+  >
     <header class="chat-header">
       <div class="chat-header-main">
         <span class="chat-title">{{
