@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, WritableSignal, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, WritableSignal, computed, inject, input, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import {
@@ -10,6 +10,7 @@ import {
 import { finalize } from 'rxjs/operators';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { marked } from 'marked';
+import { startRateLimitCountdown } from '../../utils/rate-limit-countdown.util';
 
 const OWL_ICON_PATH = 'assets/icons/owl-icon.png';
 
@@ -41,6 +42,8 @@ export class PortfolioChatWidgetComponent {
   isOpen: WritableSignal<boolean> = signal(false);
   isLoading: WritableSignal<boolean> = signal(false);
   inputValue: WritableSignal<string> = signal('');
+  rateLimitCountdown = signal(0);
+  isRateLimited = computed(() => this.rateLimitCountdown() > 0);
   messages: WritableSignal<ChatMessage[]> = signal<ChatMessage[]>([
     {
       role: 'assistant',
@@ -67,7 +70,7 @@ export class PortfolioChatWidgetComponent {
 
   send(): void {
     const text = this.inputValue().trim();
-    if (!text || this.isLoading()) {
+    if (!text || this.isLoading() || this.isRateLimited()) {
       return;
     }
     this.appendMessage({ role: 'user', content: text });
@@ -94,14 +97,17 @@ export class PortfolioChatWidgetComponent {
           });
         },
         error: (err: unknown) => {
-          const message =
-            err instanceof PortfolioChatRateLimitError
-              ? err.message
-              : "Something went wrong while contacting the assistant. Please try again.";
-          this.appendMessage({
-            role: 'assistant',
-            content: message,
-          });
+          if (err instanceof PortfolioChatRateLimitError) {
+            this.appendMessage({ role: 'assistant', content: err.message });
+            if (err.retryAfterSeconds) {
+              startRateLimitCountdown(err.retryAfterSeconds, this.rateLimitCountdown, this.destroyRef);
+            }
+          } else {
+            this.appendMessage({
+              role: 'assistant',
+              content: 'Something went wrong while contacting the assistant. Please try again.',
+            });
+          }
         },
       });
   }

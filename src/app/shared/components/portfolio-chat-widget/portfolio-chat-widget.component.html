@@ -88,6 +88,11 @@
       (submit)="$event.preventDefault(); send()"
       aria-label="Ask a question about Kapil"
     >
+      @if (isRateLimited()) {
+        <p class="chat-rate-limit-notice" role="status">
+          Too many requests. Try again in {{ rateLimitCountdown() }}s
+        </p>
+      }
       <div class="chat-input-wrap">
         <textarea
           class="chat-input"
@@ -98,6 +103,7 @@
           (keydown)="handleKeydown($event)"
           placeholder="Ask about experience, skills, projects, blogs..."
           aria-describedby="chat-char-hint"
+          [disabled]="isRateLimited()"
         ></textarea>
         <span id="chat-char-hint" class="chat-char-hint" aria-live="polite"
           >{{ inputValue().length }}/500</span
@@ -106,7 +112,7 @@
       <button
         type="submit"
         class="chat-send-button"
-        [disabled]="isLoading() || !inputValue().trim()"
+        [disabled]="isLoading() || isRateLimited() || !inputValue().trim()"
         aria-label="Send question"
       >
         <i class="fas fa-paper-plane"></i>

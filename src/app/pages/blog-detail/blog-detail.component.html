@@ -230,12 +230,16 @@
               (keydown)="handleAskKeydown($event)"
               placeholder="e.g. What is the main takeaway?"
               rows="3"
-              [disabled]="askLoading()"
+              [disabled]="askLoading() || isAskRateLimited()"
             ></textarea>
             <button
               type="submit"
               class="ask-submit-btn"
-              [disabled]="askLoading() || !askQuestionInputReadonly().trim()"
+              [disabled]="
+                askLoading() ||
+                isAskRateLimited() ||
+                !askQuestionInputReadonly().trim()
+              "
             >
               @if (askLoading()) {
                 <i class="fas fa-spinner fa-spin" aria-hidden="true"></i>
@@ -248,6 +252,11 @@
           </form>
           @if (askError()) {
             <p class="ask-error" role="alert">{{ askError() }}</p>
+          }
+          @if (isAskRateLimited()) {
+            <p class="ask-rate-limit-countdown" role="status">
+              Try again in {{ askRateLimitCountdown() }}s
+            </p>
           }
           @if (askAnswer()) {
             <div class="ask-answer">

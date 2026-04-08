@@ -25,6 +25,9 @@ export interface PortfolioChatResponse {
 /** Thrown when the API returns 429 Too Many Requests. */
 export class PortfolioChatRateLimitError extends Error {
   override name = 'PortfolioChatRateLimitError';
+  constructor(message: string, public readonly retryAfterSeconds?: number) {
+    super(message);
+  }
 }
 
 @Injectable({
@@ -51,7 +54,10 @@ export class AiChatService {
         catchError(err => {
           if (err instanceof HttpErrorResponse && err.status === 429) {
             this.environmentService.logWarn('Portfolio chat rate limited (429)');
-            return throwError(() => new PortfolioChatRateLimitError('Too many requests. Please try again later.'));
+            const retryAfterHeader = err.headers?.get('Retry-After');
+            const parsed = retryAfterHeader ? parseInt(retryAfterHeader, 10) : NaN;
+            const retryAfterSeconds = isNaN(parsed) ? undefined : parsed;
+            return throwError(() => new PortfolioChatRateLimitError('Too many requests. Please try again later.', retryAfterSeconds));
           }
           if (err instanceof TimeoutError) {
             this.environmentService.logWarn('Portfolio chat request timed out after', this.REQUEST_TIMEOUT_MS, 'ms');
