@@ -9,6 +9,7 @@ import { BlogService } from '../../services/blog.service';
 import { CategoryConfigService } from '../../services/category-config.service';
 import { Blog } from '../../models/blog.interface';
 import { DateUtils } from '../../shared/utils/date.utils';
+import { startRateLimitCountdown } from '../../shared/utils/rate-limit-countdown.util';
 import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner/loading-spinner.component';
 import { ErrorStateComponent } from '../../shared/components/error-state/error-state.component';
 import { SeoService } from '../../shared/services/seo.service';
@@ -52,6 +53,7 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
   private askAnswerSignal = signal<string | null>(null);
   private askLoadingSignal = signal(false);
   private askErrorSignal = signal<string | null>(null);
+  private askRateLimitCountdownSignal = signal(0);
   private chatheadOpen = signal(false);
   private showChathead = signal(false);
 
@@ -63,6 +65,8 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
   askAnswer = this.askAnswerSignal.asReadonly();
   askLoading = this.askLoadingSignal.asReadonly();
   askError = this.askErrorSignal.asReadonly();
+  askRateLimitCountdown = this.askRateLimitCountdownSignal.asReadonly();
+  isAskRateLimited = computed(() => this.askRateLimitCountdownSignal() > 0);
   chatheadOpenReadonly = this.chatheadOpen.asReadonly();
   showChatheadReadonly = this.showChathead.asReadonly();
   hasApiError = computed(() => this.apiErrorSignal());
@@ -260,14 +264,14 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
   handleAskKeydown(event: KeyboardEvent): void {
     if (event.key === 'Enter' && event.shiftKey) {
       event.preventDefault();
-      if (!this.askLoading() && this.askQuestionInput().trim()) {
+      if (!this.askLoading() && !this.isAskRateLimited() && this.askQuestionInput().trim()) {
         this.submitAskQuestion();
       }
     }
   }
 
   submitAskQuestion(): void {
-    if (this.askLoading()) {
+    if (this.askLoading() || this.isAskRateLimited()) {
       return;
     }
     const slug = this.route.snapshot.paramMap.get('slug');
@@ -312,8 +316,17 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
             this.askErrorSignal.set('Could not get an answer. Please try again.');
           }
         },
-        error: () => {
-          this.askErrorSignal.set('Something went wrong. Please try again.');
+        error: (err: unknown) => {
+          const standardizedError = err as { code?: string; retryAfterSeconds?: number } | null;
+          if (standardizedError?.code === 'RATE_LIMITED') {
+            this.askErrorSignal.set('Too many requests. Please try again later.');
+            const retryAfter = standardizedError.retryAfterSeconds;
+            if (typeof retryAfter === 'number' && retryAfter > 0) {
+              startRateLimitCountdown(retryAfter, this.askRateLimitCountdownSignal, this.destroyRef);
+            }
+          } else {
+            this.askErrorSignal.set('Something went wrong. Please try again.');
+          }
         },
       });
   }

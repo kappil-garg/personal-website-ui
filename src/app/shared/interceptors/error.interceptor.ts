@@ -95,6 +95,13 @@ export class ErrorInterceptor implements HttpInterceptor {
           message: errorMessage,
           code: errorCode
         });
+        // Parse Retry-After on 429 so components can show a countdown timer
+        let retryAfterSeconds: number | undefined;
+        if (error.status === 429) {
+          const retryAfterHeader = error.headers?.get('Retry-After');
+          const parsed = retryAfterHeader ? parseInt(retryAfterHeader, 10) : NaN;
+          retryAfterSeconds = isNaN(parsed) ? undefined : parsed;
+        }
         // Create a standardized error response
         const standardizedError = {
           message: errorMessage,
@@ -102,6 +109,7 @@ export class ErrorInterceptor implements HttpInterceptor {
           status: error.status,
           url: req.url,
           timestamp: new Date().toISOString(),
+          retryAfterSeconds,
           originalError: this.environmentService.isDebugModeEnabled ? error : undefined
         };
         return throwError(() => standardizedError);

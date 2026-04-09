@@ -6,6 +6,7 @@ import { timer } from 'rxjs';
 import { PortfolioService } from '../../services/portfolio.service';
 import { ContactService } from '../../services/contact.service';
 import { SeoService } from '../../shared/services/seo.service';
+import { startRateLimitCountdown } from '../../shared/utils/rate-limit-countdown.util';
 
 @Component({
   selector: 'app-contact',
@@ -36,6 +37,8 @@ export class ContactComponent implements OnInit {
   personalInfo = computed(() => this.portfolioService.personalInfo());
 
   polishLoading = signal(false);
+  rateLimitCountdown = signal(0);
+  isRateLimited = computed(() => this.rateLimitCountdown() > 0);
 
   constructor() {
     this.contactForm = this.fb.group({
@@ -61,6 +64,9 @@ export class ContactComponent implements OnInit {
   }
 
   onSubmit(): void {
+    if (this.isRateLimited()) {
+      return;
+    }
     if (this.contactForm.valid) {
       this.contactService.submitContactForm(this.contactForm.value).pipe(
         takeUntilDestroyed(this.destroyRef)
@@ -85,6 +91,10 @@ export class ContactComponent implements OnInit {
               this.cdr.markForCheck();
             });
           } else {
+            const retryAfter = this.contactService.retryAfterSeconds();
+            if (retryAfter > 0) {
+              startRateLimitCountdown(retryAfter, this.rateLimitCountdown, this.destroyRef);
+            }
             this.cdr.markForCheck();
           }
         },

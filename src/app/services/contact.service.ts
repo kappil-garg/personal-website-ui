@@ -21,10 +21,12 @@ export class ContactService {
   private successSignal = signal<boolean>(false);
   private loadingSignal = signal<boolean>(false);
   private errorSignal = signal<string | null>(null);
+  private retryAfterSecondsSignal = signal<number>(0);
 
   error = this.errorSignal.asReadonly();
   success = this.successSignal.asReadonly();
   loading = this.loadingSignal.asReadonly();
+  retryAfterSeconds = this.retryAfterSecondsSignal.asReadonly();
 
   private extractSuccessMessage(response: ApiResponse<ContactResponse>): string {
     if (response.data && typeof response.data === 'object' && typeof response.data.message === 'string') {
@@ -40,6 +42,7 @@ export class ContactService {
     this.loadingSignal.set(true);
     this.errorSignal.set(null);
     this.successSignal.set(false);
+    this.retryAfterSecondsSignal.set(0);
     return this.http.post<ApiResponse<ContactResponse>>(`${this.API_BASE_URL}`, formData).pipe(
       timeout(this.REQUEST_TIMEOUT_MS),
       map(response => {
@@ -56,6 +59,9 @@ export class ContactService {
           this.errorSignal.set('Request timed out. Please check your connection and try again.');
         } else {
           this.environmentService.warn('Error submitting contact form:', error);
+          if (error.code === 'RATE_LIMITED') {
+            this.retryAfterSecondsSignal.set(error.retryAfterSeconds ?? 0);
+          }
           const errorMessage = error.error?.message || error.message || 'Failed to send message. Please try again later.';
           this.errorSignal.set(errorMessage);
         }
@@ -71,6 +77,7 @@ export class ContactService {
   resetFormState(): void {
     this.errorSignal.set(null);
     this.successSignal.set(false);
+    this.retryAfterSecondsSignal.set(0);
   }
 
   private readonly POLISH_TIMEOUT_MS = 30 * 1000;

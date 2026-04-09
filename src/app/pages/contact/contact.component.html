@@ -188,6 +188,12 @@
             </div>
           }
 
+          @if (isRateLimited()) {
+            <p class="rate-limit-countdown" role="status">
+              You can try again in {{ rateLimitCountdown() }}s
+            </p>
+          }
+
           @if (success()) {
             <div class="form-success" role="alert">
               <i class="fas fa-check-circle" aria-hidden="true"></i>
@@ -198,7 +204,7 @@
           <button
             type="submit"
             class="submit-button"
-            [disabled]="loading() || contactForm.invalid"
+            [disabled]="loading() || isRateLimited() || contactForm.invalid"
           >
             @if (loading()) {
               <i class="fas fa-spinner fa-spin" aria-hidden="true"></i>
