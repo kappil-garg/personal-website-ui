@@ -320,11 +320,10 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
           const standardizedError = err as { code?: string; retryAfterSeconds?: number } | null;
           if (standardizedError?.code === 'RATE_LIMITED') {
             this.askErrorSignal.set('Too many requests. Please try again later.');
-            startRateLimitCountdown(
-              standardizedError.retryAfterSeconds ?? 60,
-              this.askRateLimitCountdownSignal,
-              this.destroyRef
-            );
+            const retryAfter = standardizedError.retryAfterSeconds;
+            if (typeof retryAfter === 'number' && retryAfter > 0) {
+              startRateLimitCountdown(retryAfter, this.askRateLimitCountdownSignal, this.destroyRef);
+            }
           } else {
             this.askErrorSignal.set('Something went wrong. Please try again.');
           }

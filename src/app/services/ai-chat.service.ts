@@ -44,6 +44,22 @@ export class AiChatService {
     return this.environmentService.getApiUrl('/ai/chat');
   }
 
+  private rateLimitFromError(err: unknown): { retryAfterSeconds?: number } | null {
+    if (err instanceof HttpErrorResponse && err.status === 429) {
+      const retryAfterHeader = err.headers?.get('Retry-After');
+      const parsed = retryAfterHeader ? parseInt(retryAfterHeader, 10) : NaN;
+      const retryAfterSeconds = isNaN(parsed) ? undefined : parsed;
+      return { retryAfterSeconds };
+    }
+    if (typeof err === 'object' && err !== null) {
+      const o = err as { code?: string; status?: number; retryAfterSeconds?: number };
+      if (o.code === 'RATE_LIMITED' || o.status === 429) {
+        return { retryAfterSeconds: o.retryAfterSeconds };
+      }
+    }
+    return null;
+  }
+
   sendMessage(message: string, projectId?: string | null): Observable<PortfolioChatResponse | null> {
     const payload: PortfolioChatRequest = { message, projectId };
     return this.http
@@ -52,12 +68,12 @@ export class AiChatService {
         timeout(this.REQUEST_TIMEOUT_MS),
         map(response => response.data ?? null),
         catchError(err => {
-          if (err instanceof HttpErrorResponse && err.status === 429) {
+          const rateLimit = this.rateLimitFromError(err);
+          if (rateLimit) {
             this.environmentService.logWarn('Portfolio chat rate limited (429)');
-            const retryAfterHeader = err.headers?.get('Retry-After');
-            const parsed = retryAfterHeader ? parseInt(retryAfterHeader, 10) : NaN;
-            const retryAfterSeconds = isNaN(parsed) ? undefined : parsed;
-            return throwError(() => new PortfolioChatRateLimitError('Too many requests. Please try again later.', retryAfterSeconds));
+            return throwError(
+              () => new PortfolioChatRateLimitError('Too many requests. Please try again later.', rateLimit.retryAfterSeconds),
+            );
           }
           if (err instanceof TimeoutError) {
             this.environmentService.logWarn('Portfolio chat request timed out after', this.REQUEST_TIMEOUT_MS, 'ms');

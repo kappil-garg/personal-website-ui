@@ -64,6 +64,9 @@ export class ContactComponent implements OnInit {
   }
 
   onSubmit(): void {
+    if (this.isRateLimited()) {
+      return;
+    }
     if (this.contactForm.valid) {
       this.contactService.submitContactForm(this.contactForm.value).pipe(
         takeUntilDestroyed(this.destroyRef)
@@ -88,14 +91,14 @@ export class ContactComponent implements OnInit {
               this.cdr.markForCheck();
             });
           } else {
+            const retryAfter = this.contactService.retryAfterSeconds();
+            if (retryAfter > 0) {
+              startRateLimitCountdown(retryAfter, this.rateLimitCountdown, this.destroyRef);
+            }
             this.cdr.markForCheck();
           }
         },
         error: () => {
-          const retryAfter = this.contactService.retryAfterSeconds();
-          if (retryAfter > 0) {
-            startRateLimitCountdown(retryAfter, this.rateLimitCountdown, this.destroyRef);
-          }
           this.cdr.markForCheck();
         }
       });
