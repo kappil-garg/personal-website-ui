@@ -5,6 +5,9 @@ on:
     - cron: '0 9 * * 1'    # Every Monday at 9am UTC
   workflow_dispatch:       # Manual trigger from GitHub UI
 
+permissions:
+  contents: read
+
 jobs:
   audit:
     name: Check for vulnerabilities
@@ -25,7 +28,12 @@ jobs:
       - name: Run audit
         id: audit
         run: |
-          if npm audit --json | jq -e '.vulnerabilities | length > 0' > /dev/null 2>&1; then
+          AUDIT_JSON=$(npm audit --json) || true
+          if ! echo "$AUDIT_JSON" | jq -e . > /dev/null 2>&1; then
+            echo "npm audit did not produce valid JSON — possible registry/network error."
+            exit 1
+          fi
+          if echo "$AUDIT_JSON" | jq -e '.vulnerabilities | length > 0' > /dev/null 2>&1; then
             echo "has_vulnerabilities=true" >> $GITHUB_OUTPUT
             echo "Vulnerabilities found."
           else
@@ -56,10 +64,10 @@ jobs:
         id: branch
         run: |
           DATE=$(date -u +%Y-%m-%d)
-          echo "name=fix/npm-vuln-${DATE}" >> $GITHUB_OUTPUT
+          echo "name=fix/npm-vuln-${DATE}-${{ github.run_id }}" >> $GITHUB_OUTPUT
 
       - name: Run Claude Code to fix vulnerabilities
-        uses: anthropics/claude-code-action@beta
+        uses: anthropics/claude-code-action@567fe954a4527e81f132d87d1bdbcc94f7737434 # v1
         with:
           prompt: "/fix-npm-vulnerabilities"
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
