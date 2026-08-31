@@ -1,9 +1,11 @@
 name: Auto-fix npm vulnerabilities
 
+# Disabled: Claude Code fails with "Credit balance is too low" and was marking the workflow as failed. 
+# Re-enable the schedule when Anthropic credits are available.
 on:
-  schedule:
-    - cron: '0 9 * * 1'    # Every Monday at 9am UTC
-  workflow_dispatch:       # Manual trigger from GitHub UI
+  # schedule:
+  #   - cron: '0 9 * * 1'    # Every Monday at 9am UTC
+  workflow_dispatch:       # Manual trigger from GitHub UI only while disabled
 
 permissions:
   contents: read
